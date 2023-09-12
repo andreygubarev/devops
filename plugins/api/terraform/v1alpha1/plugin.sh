@@ -17,3 +17,13 @@ api_terraform_v1alpha1__settings_terraform_version() {
     fi
     echo "$v"
 }
+
+### Runtime ###################################################################
+api_terraform_v1alpha1["system_terraform_version"]=api_terraform_v1alpha1__system_terraform_version
+api_terraform_v1alpha1__system_terraform_version() {
+    if command -v terraform >/dev/null 2>&1; then
+        terraform version | head -n1 | cut -d' ' -f2 | cut -d'v' -f2
+    else
+        log info "terraform.io/v1alpha1/system_terraform_version: terraform not found"
+    fi
+}
