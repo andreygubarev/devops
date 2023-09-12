@@ -162,8 +162,7 @@ command_clean() {
         log critical "usage: $0 clean -f <manifest>"
     fi
 
-    build_set_context
-    rm -rf "$build_dist"
+    rm -rf "$(build_dist)"
 }
 
 command_install() {
