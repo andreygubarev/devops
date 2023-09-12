@@ -2,6 +2,19 @@
 set -euo pipefail
 
 ### Globals ###################################################################
+INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+
+### Plugins ###################################################################
+INFRACTL_PLUGINS_PATH="$INFRACTL_PATH/plugins"
+
+# shellcheck source=plugins/api/ansible/v1alpha1/plugin.sh
+source "$INFRACTL_PLUGINS_PATH/api/ansible/v1alpha1/plugin.sh"
+
+# shellcheck source=plugins/api/terraform/v1alpha1/plugin.sh
+source "$INFRACTL_PLUGINS_PATH/api/terraform/v1alpha1/plugin.sh"
+
+
+### Runtime ###################################################################
 INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 
 ### Logging ###################################################################
