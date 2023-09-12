@@ -8,7 +8,7 @@ new_manifest() {
     manifest="$v"
     log debug "manifest: set $manifest"
 
-    api_set "$(manifest_apiversion)"
+    new_api "$(manifest_apiversion)"
 }
 
 manifest_path() {
