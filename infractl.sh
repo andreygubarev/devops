@@ -213,15 +213,6 @@ build() {
 
 ### Ansible ###################################################################
 ### Ansible | Build ###########################################################
-ansible_get_inventory() {
-    local -r v=$(yq '.spec.ansible_inventory' < "$manifest_path")
-    if [ "$v" == "null" ]; then
-        echo ""
-    else
-        echo "--inventory $v"
-    fi
-}
-
 ansible_get_playbook() {
     local -r v=$(yq '.spec.ansible_playbook' < "$manifest_path")
     if [ "$v" == "null" ]; then
@@ -304,7 +295,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(ansible_get_inventory) $(ansible_get_dryrun) $(ansible_get_extra_vars) src/$(ansible_get_playbook)"
+    echo "ansible-playbook $(api_call "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(ansible_get_extra_vars) src/$(ansible_get_playbook)"
     popd
 }
 
