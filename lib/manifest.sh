@@ -6,7 +6,7 @@ new_manifest() {
         log critical "manifest: not found: $1"
     fi
     manifest="$v"
-    log debug "manifest: set $manifest"
+    log debug "manifest: new $manifest"
 
     new_api "$(manifest_apiversion)"
 }
@@ -22,6 +22,7 @@ manifest_dir() {
     fi
     echo "$v"
 }
+# cache manifest_dir
 
 manifest_query() {
     local -r query="$1"

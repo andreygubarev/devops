@@ -4,7 +4,7 @@
 
 new_api() {
     local -r apiversion="$1"
-    log info "setting api: $apiversion"
+    log info "api: new $apiversion"
 
     declare -gA apis
     case "$apiversion" in
