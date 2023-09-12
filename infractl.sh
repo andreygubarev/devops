@@ -4,6 +4,11 @@ set -euo pipefail
 ### Globals ###################################################################
 INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 
+### Libarary ##################################################################
+
+# shellcheck source=lib/api.sh
+source "$INFRACTL_PATH/lib/api.sh"
+
 ### Plugins ###################################################################
 INFRACTL_PLUGINS_PATH="$INFRACTL_PATH/plugins"
 
@@ -154,6 +159,10 @@ manifest_set_context() {
     fi
 }
 
+manifest_set_api_context() {
+    api_set_context "$manifest_apiversion"
+}
+
 ### Build #####################################################################
 
 build_set_context() {
@@ -217,10 +226,10 @@ build_environment() {
 
 build_template_config() {
     case "$manifest_apiversion" in
-        "terraform.io/v1")
+        "terraform.io/v1alpha1")
             terraform_template_config "$build_config"
             ;;
-        "ansible.com/v1")
+        "ansible.com/v1alpha1")
             ansible_template_config "$build_config"
             ;;
         *)
@@ -231,10 +240,10 @@ build_template_config() {
 
 build_template() {
     case "$manifest_apiversion" in
-        "terraform.io/v1")
+        "terraform.io/v1alpha1")
             template_render "terraform-v1" "$build_config" "$build_dist"
             ;;
-        "ansible.com/v1")
+        "ansible.com/v1alpha1")
             template_render "ansible-v1" "$build_config" "$build_dist"
             ;;
         *)
@@ -255,15 +264,6 @@ build() {
 
 ### Ansible ###################################################################
 ### Ansible | Build ###########################################################
-ansible_get_version() {
-    local -r v=$(yq '.metadata.annotations["ansible.com/version"]' < "$manifest_path")
-    if [ "$v" == "null" ]; then
-        echo ""
-    else
-        echo "$v"
-    fi
-}
-
 ansible_get_inventory() {
     local -r v=$(yq '.spec.ansible_inventory' < "$manifest_path")
     if [ "$v" == "null" ]; then
@@ -342,7 +342,7 @@ default_context:
     version: "$manifest_version"
     ansible_inventory: "$(ansible_get_settings_inventory)"
     ansible_roles_path: "$(ansible_get_settings_roles_path)"
-    ansible_version: "$(ansible_get_version)"
+    ansible_version: "$(api_call "get_version" "$manifest_path")"
     python_version: "$(ansible_get_python_version)"
     python_requirements: "$(ansible_get_python_requirements)"
 EOF
@@ -467,15 +467,16 @@ command_build() {
 
     if [ -n "${opt_f:-}" ]; then
         manifest_set_context "$opt_f"
+        manifest_set_api_context
     else
         log critical "usage: $0 build -f <manifest>"
     fi
 
     case "$manifest_apiversion" in
-        "terraform.io/v1")
+        "terraform.io/v1alpha1")
             build
             ;;
-        "ansible.com/v1")
+        "ansible.com/v1alpha1")
             build
             ;;
         *)
@@ -505,6 +506,7 @@ command_run() {
     if [ -n "${opt_f:-}" ]; then
         log debug "setting manifest context: $opt_f"
         manifest_set_context "$opt_f"
+        manifest_set_api_context
     else
         log critical "usage: $0 run [-n] -f <manifest>"
     fi
@@ -514,10 +516,10 @@ command_run() {
     fi
 
     case "$manifest_apiversion" in
-        "terraform.io/v1")
+        "terraform.io/v1alpha1")
             terraform_run
             ;;
-        "ansible.com/v1")
+        "ansible.com/v1alpha1")
             ansible_run
             ;;
         *)
@@ -543,6 +545,7 @@ command_clean() {
 
     if [ -n "${opt_f:-}" ]; then
         manifest_set_context "$opt_f"
+        manifest_set_api_context
     else
         log critical "usage: $0 clean -f <manifest>"
     fi
