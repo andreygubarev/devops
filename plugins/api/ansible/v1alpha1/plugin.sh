@@ -27,7 +27,7 @@ api_ansible_v1alpha1__settings_python_requirements() {
 ### Inventory #################################################################
 api_ansible_v1alpha1["inventory"]=api_ansible_v1alpha1__inventory
 api_ansible_v1alpha1__inventory() {
-    local -r v=$(manifest_query'.spec.inventory')
+    local -r v=$(manifest_query '.spec.inventory')
     if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/inventory: inventory field not found"
         return
