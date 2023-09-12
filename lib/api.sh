@@ -6,13 +6,13 @@ api_set_context() {
     local -r apiversion="$1"
     log info "setting api: $apiversion"
 
-    declare -gA api
+    declare -gA apis
     case "$apiversion" in
         ansible.com/v1alpha1)
             # shellcheck disable=SC2154
             for key in "${!api_ansible_v1alpha1[@]}"; do
-                api["$key"]="${api_ansible_v1alpha1[$key]}"
-                log debug "api[$key] -> ${api_ansible_v1alpha1[$key]}"
+                apis["$key"]="${api_ansible_v1alpha1[$key]}"
+                log debug "apis[$key] -> ${api_ansible_v1alpha1[$key]}"
             done
             ;;
         *)
@@ -22,9 +22,9 @@ api_set_context() {
     esac
 }
 
-api_call() {
+api() {
     local -r api_func="$1"
     shift
 
-    "${api[$api_func]}" "$@"
+    "${apis[$api_func]}" "$@"
 }

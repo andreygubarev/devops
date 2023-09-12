@@ -253,7 +253,7 @@ default_context:
     version: "$manifest_version"
     ansible_inventory: "$(ansible_get_settings_inventory)"
     ansible_roles_path: "$(ansible_get_settings_roles_path)"
-    ansible_version: "$(api_call "get_version" "$manifest_path")"
+    ansible_version: "$(api "get_version" "$manifest_path")"
     python_version: "$(ansible_get_python_version)"
     python_requirements: "$(ansible_get_python_requirements)"
 EOF
@@ -266,7 +266,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(api_call "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(api_call "get_extra_vars") src/$(api_call "get_playbook" "$manifest_path")"
+    echo "ansible-playbook $(api "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(api "get_extra_vars") src/$(api "get_playbook" "$manifest_path")"
     popd
 }
 
