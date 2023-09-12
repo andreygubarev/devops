@@ -19,9 +19,6 @@ source "$INFRACTL_PATH/lib/manifest.sh"
 # shellcheck source=lib/build.sh
 source "$INFRACTL_PATH/lib/build.sh"
 
-# shellcheck source=lib/templates.sh
-source "$INFRACTL_PATH/lib/templates.sh"
-
 # shellcheck source=lib/api.sh
 source "$INFRACTL_PATH/lib/api.sh"
 

@@ -87,5 +87,5 @@ api_ansible_v1alpha1__render_template() {
     local -r template_config="$1"
     local -r template_output="$2"
 
-    template_render "$template_path" "$template_config" "$template_output"
+    utils::render_template "$template_path" "$template_config" "$template_output"
 }
