@@ -10,6 +10,9 @@ INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
 
+# shellcheck source=lib/context.sh
+source "$INFRACTL_PATH/lib/context.sh"
+
 # shellcheck source=lib/manifest.sh
 source "$INFRACTL_PATH/lib/manifest.sh"
 
@@ -82,7 +85,7 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        manifest_set "$opt_f"
+        new_manifest "$opt_f"
     else
         log critical "usage: $0 build -f <manifest>"
     fi
@@ -119,7 +122,7 @@ command_run() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        manifest_set "$opt_f"
+        new_manifest "$opt_f"
     else
         log critical "usage: $0 run [-n] -f <manifest>"
     fi
@@ -157,7 +160,7 @@ command_clean() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        manifest_set "$opt_f"
+        new_manifest "$opt_f"
     else
         log critical "usage: $0 clean -f <manifest>"
     fi

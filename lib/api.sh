@@ -2,7 +2,7 @@
 
 ### Functions #################################################################
 
-api_set() {
+new_api() {
     local -r apiversion="$1"
     log info "setting api: $apiversion"
 

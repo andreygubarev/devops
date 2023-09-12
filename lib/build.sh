@@ -60,7 +60,6 @@ build_environment() {
 }
 
 build() {
-    build_set_context
     api "template_config" "$(build_config)"
     api "template" "$(build_config)" "$(build_dist)"
     build_environment
