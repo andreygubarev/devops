@@ -295,7 +295,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(api_call "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(ansible_get_extra_vars) src/$(ansible_get_playbook)"
+    echo "ansible-playbook $(api_call "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(ansible_get_extra_vars) src/$(api_call "get_playbook" "$manifest_path")"
     popd
 }
 
