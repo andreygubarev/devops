@@ -22,7 +22,6 @@ manifest_dir() {
     fi
     echo "$v"
 }
-# cache manifest_dir
 
 manifest_query() {
     local -r query="$1"

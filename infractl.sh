@@ -87,17 +87,7 @@ command_build() {
         log critical "usage: $0 build -f <manifest>"
     fi
 
-    case "$(manifest_apiversion)" in
-        "terraform.io/v1alpha1")
-            build
-            ;;
-        "ansible.com/v1alpha1")
-            build
-            ;;
-        *)
-            log critical "unsupported apiVersion: $(manifest_apiversion)"
-            ;;
-    esac
+    build
 }
 
 command_run() {
