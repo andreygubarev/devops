@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-build_set_context() {
-    log debug "setting build context"
-}
-
 build_dist() {
     local -r v="$(manifest_dir)/.infractl/dist/$(manifest_name)"
     mkdir -p "$v"
