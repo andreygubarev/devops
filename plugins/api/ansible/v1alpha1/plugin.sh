@@ -37,3 +37,24 @@ api_ansible_v1alpha1_get_playbook() {
         echo "$v"
     fi
 }
+
+# shellcheck disable=SC2034
+api_ansible_v1alpha1["get_extra_vars"]=api_ansible_v1alpha1_get_extra_vars
+api_ansible_v1alpha1_get_extra_vars() {
+    local -r extra_vars=$(yq '.spec.ansible_extra_vars' < "$manifest_path")
+
+    local extra_vars_file=""
+    if [ -n "$extra_vars" ]; then
+        local extra_vars_file="$build_output/extra_vars.yaml"
+        cat <<- EOF > "$extra_vars_file"
+$extra_vars
+EOF
+    fi
+
+    local extra_vars_arg=""
+    if [ -n "$extra_vars_file" ]; then
+        local extra_vars_arg="--extra-vars @$extra_vars_file"
+    fi
+
+    echo "$extra_vars_arg"
+}

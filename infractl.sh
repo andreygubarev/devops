@@ -213,35 +213,6 @@ build() {
 
 ### Ansible ###################################################################
 ### Ansible | Build ###########################################################
-ansible_get_playbook() {
-    local -r v=$(yq '.spec.ansible_playbook' < "$manifest_path")
-    if [ "$v" == "null" ]; then
-        echo "Ansible playbook not found"
-        exit 1
-    else
-        echo "$v"
-    fi
-}
-
-ansible_get_extra_vars() {
-    local -r extra_vars=$(yq '.spec.ansible_extra_vars' < "$manifest_path")
-
-    local extra_vars_file=""
-    if [ -n "$extra_vars" ]; then
-        local extra_vars_file="$build_output/extra_vars.yaml"
-        cat <<- EOF > "$extra_vars_file"
-$extra_vars
-EOF
-    fi
-
-    local extra_vars_arg=""
-    if [ -n "$extra_vars_file" ]; then
-        local extra_vars_arg="--extra-vars @$extra_vars_file"
-    fi
-
-    echo "$extra_vars_arg"
-}
-
 ansible_get_dryrun() {
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         echo "--check"
@@ -295,7 +266,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(api_call "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(ansible_get_extra_vars) src/$(api_call "get_playbook" "$manifest_path")"
+    echo "ansible-playbook $(api_call "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(api_call "get_extra_vars") src/$(api_call "get_playbook" "$manifest_path")"
     popd
 }
 
