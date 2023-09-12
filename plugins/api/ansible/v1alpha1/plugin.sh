@@ -67,8 +67,8 @@ api_ansible_v1alpha1__dryrun() {
 }
 
 ### Template ##################################################################
-api_ansible_v1alpha1["template_config"]=api_ansible_v1alpha1__template_config
-api_ansible_v1alpha1__template_config() {
+api_ansible_v1alpha1["render_template_config"]=api_ansible_v1alpha1__render_template_config
+api_ansible_v1alpha1__render_template_config() {
     cat <<- EOF > "$1"
 default_context:
     name: "$(manifest_name)"
@@ -81,8 +81,8 @@ default_context:
 EOF
 }
 
-api_ansible_v1alpha1["template"]=api_ansible_v1alpha1__template
-api_ansible_v1alpha1__template() {
+api_ansible_v1alpha1["render_template"]=api_ansible_v1alpha1__render_template
+api_ansible_v1alpha1__render_template() {
     local -r template_path="$API_ANSIBLE_V1ALPHA1_PATH/template"
     local -r template_config="$1"
     local -r template_output="$2"
