@@ -7,6 +7,9 @@ INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 
 ### Libarary ##################################################################
 
+# shellcheck source=lib/utils.sh
+source "$INFRACTL_PATH/lib/utils.sh"
+
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
 
@@ -22,16 +25,6 @@ source "$INFRACTL_PATH/lib/templates.sh"
 # shellcheck source=lib/api.sh
 source "$INFRACTL_PATH/lib/api.sh"
 
-### Plugins ###################################################################
-INFRACTL_PLUGINS_PATH="$INFRACTL_PATH/plugins"
-
-# shellcheck source=plugins/api/ansible/v1alpha1/plugin.sh
-source "$INFRACTL_PLUGINS_PATH/api/ansible/v1alpha1/plugin.sh"
-
-# shellcheck source=plugins/api/terraform/v1alpha1/plugin.sh
-source "$INFRACTL_PLUGINS_PATH/api/terraform/v1alpha1/plugin.sh"
-
-
 ### Ansible ###################################################################
 
 ansible_run() {
@@ -40,7 +33,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(api "inventory") $(api "dryrun") $(api "extra_vars" "$build_output") src/$(api "playbook")"
+    echo "ansible-playbook $(api::inventory) $(api::dryrun) $(api::extra_vars "$(build_output)") src/$(api::playbook)"
     popd
 }
 
@@ -52,8 +45,8 @@ terraform_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    api "set_terraform_version"
-    api "set_terragrunt_version"
+    api::set_terraform_version
+    api::set_terragrunt_version
 
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         log info "running: terragrunt plan"
