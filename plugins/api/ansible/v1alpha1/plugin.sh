@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 API_ANSIBLE_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/ansible/v1alpha1"
-declare -A api_ansible_v1alpha1
+declare -gA api_ansible_v1alpha1
 
 ### Settings ##################################################################
 api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1__settings_ansible_version
@@ -48,13 +48,13 @@ api_ansible_v1alpha1__playbook() {
 
 api_ansible_v1alpha1["extra_vars"]=api_ansible_v1alpha1__extra_vars
 api_ansible_v1alpha1__extra_vars() {
-    local -r v=$(api_ansible_v1alpha1__manifest "$1" '.spec.extra_vars')
+    local -r v=$(manifest_query '.spec.extra_vars')
     if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/extra_vars: extra_vars field not found"
         return
     fi
 
-    local f="$2/extra_vars.yaml"
+    local f="$1/extra_vars.yaml"
     echo "$v" > "$f"
     echo "--extra-vars @$f"
 }
@@ -71,8 +71,8 @@ api_ansible_v1alpha1["template_config"]=api_ansible_v1alpha1__template_config
 api_ansible_v1alpha1__template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$manifest_name"
-    version: "$manifest_version"
+    name: "$(manifest_name)"
+    version: "$(manifest_version)"
     ansible_inventory: "$(api_ansible_v1alpha1__inventory)"
     ansible_roles_path: "$(api_ansible_v1alpha1__settings_ansible_roles)"
     ansible_version: "$(api_ansible_v1alpha1__settings_ansible_version)"

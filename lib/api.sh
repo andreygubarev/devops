@@ -2,7 +2,7 @@
 
 ### Functions #################################################################
 
-api_set_context() {
+api_set() {
     local -r apiversion="$1"
     log info "setting api: $apiversion"
 

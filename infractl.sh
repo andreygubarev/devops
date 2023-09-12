@@ -40,7 +40,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(api "inventory" "$manifest_path") $(api "dryrun") $(api "extra_vars" "$manifest_path" "$build_output") src/$(api "playbook" "$manifest_path")"
+    echo "ansible-playbook $(api "inventory") $(api "dryrun") $(api "extra_vars" "$build_output") src/$(api "playbook")"
     popd
 }
 
@@ -52,8 +52,8 @@ terraform_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    api "set_terraform_version" "$manifest_path"
-    api "set_terragrunt_version" "$manifest_path"
+    api "set_terraform_version"
+    api "set_terragrunt_version"
 
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         log info "running: terragrunt plan"
@@ -82,13 +82,12 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        manifest_set_context "$opt_f"
-        manifest_set_api_context
+        manifest_set "$opt_f"
     else
         log critical "usage: $0 build -f <manifest>"
     fi
 
-    case "$manifest_apiversion" in
+    case "$(manifest_apiversion)" in
         "terraform.io/v1alpha1")
             build
             ;;
@@ -96,7 +95,7 @@ command_build() {
             build
             ;;
         *)
-            log critical "unsupported apiVersion: $manifest_apiversion"
+            log critical "unsupported apiVersion: $(manifest_apiversion)"
             ;;
     esac
 }
@@ -120,9 +119,7 @@ command_run() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        log debug "setting manifest context: $opt_f"
-        manifest_set_context "$opt_f"
-        manifest_set_api_context
+        manifest_set "$opt_f"
     else
         log critical "usage: $0 run [-n] -f <manifest>"
     fi
@@ -131,7 +128,7 @@ command_run() {
         INFRACTL_DRYRUN="true"
     fi
 
-    case "$manifest_apiversion" in
+    case "$(manifest_apiversion)" in
         "terraform.io/v1alpha1")
             terraform_run
             ;;
@@ -139,7 +136,7 @@ command_run() {
             ansible_run
             ;;
         *)
-            log critical "unsupported apiVersion: $manifest_apiversion"
+            log critical "unsupported apiVersion: $(manifest_apiversion)"
             ;;
     esac
 }
@@ -160,8 +157,7 @@ command_clean() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        manifest_set_context "$opt_f"
-        manifest_set_api_context
+        manifest_set "$opt_f"
     else
         log critical "usage: $0 clean -f <manifest>"
     fi

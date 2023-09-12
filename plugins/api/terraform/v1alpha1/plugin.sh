@@ -1,27 +1,6 @@
 #!/usr/bin/env bash
 API_TERRAFORM_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/terraform/v1alpha1"
-declare -A api_terraform_v1alpha1
-
-### Manifest ##################################################################
-api_terraform_v1alpha1["manifest"]=api_terraform_v1alpha1__manifest
-api_terraform_v1alpha1__manifest() {
-    if [ ! -f "$1" ]; then
-        log error "terraform.io/v1alpha1/manifest: manifest not found: $1"
-        return
-    fi
-
-    if [ -z "$2" ]; then
-        log error "terraform.io/v1alpha1/manifest: query not found"
-        return
-    fi
-
-    local -r v=$(yq "$2" < "$1")
-    if [ "$v" == "null" ]; then
-        log warn "terraform.io/v1alpha1/manifest: field not found: $2"
-        return
-    fi
-    echo "$v"
-}
+declare -gA api_terraform_v1alpha1
 
 ### Settings ##################################################################
 api_terraform_v1alpha1["settings_terraform_version"]=api_terraform_v1alpha1__settings_terraform_version
@@ -67,13 +46,8 @@ api_terraform_v1alpha1__system_terraform_version() {
 
 api_terraform_v1alpha1["set_terraform_version"]=api_terraform_v1alpha1__set_terraform_version
 api_terraform_v1alpha1__set_terraform_version() {
-    if [ ! -f "$1" ]; then
-        log error "terraform.io/v1alpha1/set_terraform_version: manifest not found: $1"
-        return
-    fi
-
-    local -r terraform_version=$(api_terraform_v1alpha1__settings_terraform_version "$1")
-    local -r current_terraform_version=$(api_terraform_v1alpha1__system_terraform_version "$1")
+    local -r terraform_version=$(api_terraform_v1alpha1__settings_terraform_version)
+    local -r current_terraform_version=$(api_terraform_v1alpha1__system_terraform_version)
 
     if [ "$terraform_version" != "$current_terraform_version" ]; then
         if ! command -v tfenv >/dev/null 2>&1; then
@@ -96,13 +70,8 @@ api_terraform_v1alpha1__system_terragrunt_version() {
 
 api_terraform_v1alpha1["set_terragrunt_version"]=api_terraform_v1alpha1__set_terragrunt_version
 api_terraform_v1alpha1__set_terragrunt_version() {
-    if [ ! -f "$1" ]; then
-        log error "terraform.io/v1alpha1/set_terragrunt_version: manifest not found: $1"
-        return
-    fi
-
-    local -r terragrunt_version=$(api_terraform_v1alpha1__settings_terragrunt_version "$1")
-    local -r current_terragrunt_version=$(api_terraform_v1alpha1__system_terragrunt_version "$1")
+    local -r terragrunt_version=$(api_terraform_v1alpha1__settings_terragrunt_version)
+    local -r current_terragrunt_version=$(api_terraform_v1alpha1__system_terragrunt_version)
 
     if [ "$terragrunt_version" != "$current_terragrunt_version" ]; then
         if ! command -v tfenv >/dev/null 2>&1; then
@@ -120,14 +89,14 @@ api_terraform_v1alpha1["template_config"]=api_terraform_v1alpha1__template_confi
 api_terraform_v1alpha1__template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$manifest_name"
-    version: "$manifest_version"
-    terraform_metadata_labels: "$(api_terraform_v1alpha1__labels "$manifest_path")"
-    terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend "$manifest_path")"
-    terraform_remote_state_locking: "$(api_terraform_v1alpha1__settings_remote_state_locking "$manifest_path")"
-    terraform_remote_state_region: "$(api_terraform_v1alpha1__settings_remote_state_region "$manifest_path")"
-    terraform_version: "$(api_terraform_v1alpha1__settings_terraform_version "$manifest_path")"
-    terragrunt_version: "$(api_terraform_v1alpha1__settings_terragrunt_version "$manifest_path")"
+    name: "$(manifest_name)"
+    version: "$(manifest_version)"
+    terraform_metadata_labels: "$(api_terraform_v1alpha1__labels)"
+    terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend)"
+    terraform_remote_state_locking: "$(api_terraform_v1alpha1__settings_remote_state_locking)"
+    terraform_remote_state_region: "$(api_terraform_v1alpha1__settings_remote_state_region)"
+    terraform_version: "$(api_terraform_v1alpha1__settings_terraform_version)"
+    terragrunt_version: "$(api_terraform_v1alpha1__settings_terragrunt_version)"
 EOF
 }
 
