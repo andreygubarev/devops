@@ -18,6 +18,21 @@ api_terraform_v1alpha1__settings_terraform_version() {
     echo "$v"
 }
 
+api_terraform_v1alpha1["settings_terragrunt_version"]=api_terraform_v1alpha1__settings_terragrunt_version
+api_terraform_v1alpha1__settings_terragrunt_version() {
+    if [ ! -f "$1" ]; then
+        log error "terraform.io/v1alpha1/settings_terragrunt_version: manifest not found: $1"
+        return
+    fi
+
+    local -r v=$(yq '.metadata.annotations["terragrunt.gruntwork.io/version"]' < "$1")
+    if [ "$v" == "null" ]; then
+        log warn "terraform.io/v1alpha1/settings_terragrunt_version: terragrunt version not found"
+        return
+    fi
+    echo "$v"
+}
+
 ### Runtime ###################################################################
 api_terraform_v1alpha1["system_terraform_version"]=api_terraform_v1alpha1__system_terraform_version
 api_terraform_v1alpha1__system_terraform_version() {
@@ -25,5 +40,25 @@ api_terraform_v1alpha1__system_terraform_version() {
         terraform version | head -n1 | cut -d' ' -f2 | cut -d'v' -f2
     else
         log info "terraform.io/v1alpha1/system_terraform_version: terraform not found"
+    fi
+}
+
+api_terraform_v1alpha1["set_terraform_version"]=api_terraform_v1alpha1__set_terraform_version
+api_terraform_v1alpha1__set_terraform_version() {
+    if [ ! -f "$1" ]; then
+        log error "terraform.io/v1alpha1/set_version: manifest not found: $1"
+        return
+    fi
+
+    local -r terraform_version=$(api_terraform_v1alpha1__settings_terraform_version "$1")
+    local -r current_terraform_version=$(api_terraform_v1alpha1__system_terraform_version "$1")
+
+    if [ "$terraform_version" != "$current_terraform_version" ]; then
+        if ! command -v tfenv >/dev/null 2>&1; then
+            log error "terraform.io/v1alpha1/set_version: tfenv not found"
+            return
+        fi
+        tfenv install "$terraform_version"
+        tfenv use "$terraform_version"
     fi
 }

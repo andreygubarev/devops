@@ -207,26 +207,12 @@ ansible_run() {
 
 ### Terraform #################################################################
 ### Terraform | Versions ######################################################
-terraform_set_version() {
-    local -r terraform_version=$(api "settings_terraform_version" "$manifest_path")
-    local -r current_terraform_version=$(api "system_terraform_version" "$manifest_path")
-
-    if [ "$terraform_version" != "$current_terraform_version" ]; then
-        tfenv install "$terraform_version"
-        tfenv use "$terraform_version"
-    fi
-}
-
-terragrunt_get_version() {
-    yq '.metadata.annotations["terragrunt.gruntwork.io/version"]' < "$manifest_path"
-}
-
 terragrunt_get_current_version() {
     terragrunt --version | awk '{print $3}' | cut -d'v' -f2
 }
 
 terragrunt_set_version() {
-    local -r terragrunt_version=$(terragrunt_get_version)
+    local -r terragrunt_version=$(api "settings_terragrunt_version" "$manifest_path")
     local -r current_terragrunt_version=$(terragrunt_get_current_version)
 
     if [ "$terragrunt_version" != "$current_terragrunt_version" ]; then
@@ -263,7 +249,7 @@ default_context:
     terraform_remote_state_locking: "$(terraform_template_config_get_remote_locking)"
     terraform_remote_state_region: "$(terraform_template_config_get_remote_state_region)"
     terraform_version: "$(api "settings_terraform_version" "$manifest_path")"
-    terragrunt_version: "$(terragrunt_get_version)"
+    terragrunt_version: "$(api "settings_terragrunt_version" "$manifest_path")"
 EOF
 }
 
@@ -274,7 +260,7 @@ terraform_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    terraform_set_version
+    api "set_terraform_version" "$manifest_path"
     terragrunt_set_version
 
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
