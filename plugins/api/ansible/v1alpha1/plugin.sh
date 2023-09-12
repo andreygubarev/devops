@@ -2,64 +2,46 @@
 API_ANSIBLE_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/ansible/v1alpha1"
 declare -A api_ansible_v1alpha1
 
-### Settings ##################################################################
-api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1__settings_ansible_version
-api_ansible_v1alpha1__settings_ansible_version() {
+### Manifest ##################################################################
+api_ansible_v1alpha1["manifest"]=api_ansible_v1alpha1__manifest
+api_ansible_v1alpha1__manifest() {
     if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/settings_ansible_version: manifest not found: $1"
+        log error "ansible.com/v1alpha1/manifest: manifest not found: $1"
         return
     fi
 
-    local -r v=$(yq '.metadata.annotations["ansible.com/version"]' < "$1")
+    if [ -z "$2" ]; then
+        log error "ansible.com/v1alpha1/manifest: query not found"
+        return
+    fi
+
+    local -r v=$(yq "$2" < "$1")
     if [ "$v" == "null" ]; then
+        log warn "ansible.com/v1alpha1/manifest: field not found: $2"
         return
     fi
     echo "$v"
+}
+
+### Settings ##################################################################
+api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1__settings_ansible_version
+api_ansible_v1alpha1__settings_ansible_version() {
+    api_ansible_v1alpha1__manifest "$1" '.metadata.annotations["ansible.com/version"]'
 }
 
 api_ansible_v1alpha1["settings_ansible_roles"]=api_ansible_v1alpha1__settings_ansible_roles
 api_ansible_v1alpha1__settings_ansible_roles() {
-    if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/settings_ansible_roles: manifest not found: $1"
-        return
-    fi
-
-    local -r v=$(yq '.metadata.annotations["ansible.com/roles"]' < "$1")
-    if [ "$v" == "null" ]; then
-        log warn "ansible.com/v1alpha1/settings_ansible_roles: roles not found"
-        return
-    fi
-    echo "$v"
+    api_ansible_v1alpha1__manifest "$1" '.metadata.annotations["ansible.com/roles"]'
 }
-
 
 api_ansible_v1alpha1["settings_python_version"]=api_ansible_v1alpha1__settings_python_version
 api_ansible_v1alpha1__settings_python_version() {
-    if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/settings_python_version: manifest not found: $1"
-        return
-    fi
-
-    local -r v=$(yq '.metadata.annotations["python.org/version"]' < "$1")
-    if [ "$v" == "null" ]; then
-        log warn "ansible.com/v1alpha1/settings_python_version: python version not found"
-        return
-    fi
-    echo "$v"
+    api_ansible_v1alpha1__manifest "$1" '.metadata.annotations["python.org/version"]'
 }
 
 api_ansible_v1alpha1["settings_python_requirements"]=api_ansible_v1alpha1__settings_python_requirements
 api_ansible_v1alpha1__settings_python_requirements() {
-    if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/settings_python_requirements: manifest not found: $1"
-        return
-    fi
-
-    local -r v=$(yq '.metadata.annotations["python.org/requirements"][]' < "$1")
-    if [ "$v" == "null" ]; then
-        log warn "ansible.com/v1alpha1/settings_python_requirements: requirements not found"
-        return
-    fi
+    local -r v=$(api_ansible_v1alpha1__manifest "$1" '.metadata.annotations["python.org/requirements"]')
     echo "$v" | xargs echo
 }
 
@@ -67,49 +49,20 @@ api_ansible_v1alpha1__settings_python_requirements() {
 ### Inventory #################################################################
 api_ansible_v1alpha1["inventory"]=api_ansible_v1alpha1__inventory
 api_ansible_v1alpha1__inventory() {
-    if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/inventory: manifest not found: $1"
-        return
-    fi
-
-    local -r v=$(yq '.spec.inventory' < "$1")
-    if [ "$v" == "null" ]; then
-        log warn "ansible.com/v1alpha1/inventory: inventory not found"
-        return
-    fi
+    local -r v=$(api_ansible_v1alpha1__manifest "$1" '.spec.inventory')
     echo "--inventory $v"
 }
 
 ### Playbook ##################################################################
 api_ansible_v1alpha1["playbook"]=api_ansible_v1alpha1__playbook
 api_ansible_v1alpha1__playbook() {
-    if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/playbook: manifest not found: $1"
-        return
-    fi
-
-    local -r v=$(yq '.spec.playbook' < "$1")
-    if [ "$v" == "null" ]; then
-        log error "ansible.com/v1alpha1/playbook: playbook not found"
-        return
-    fi
-    echo "$v"
+    api_ansible_v1alpha1__manifest "$1" '.spec.playbook'
 }
 
 api_ansible_v1alpha1["extra_vars"]=api_ansible_v1alpha1__extra_vars
 api_ansible_v1alpha1__extra_vars() {
-    if [ ! -f "$1" ]; then
-        log error "ansible.com/v1alpha1/extra_vars: manifest not found: $1"
-        return
-    fi
-
-    if [ ! -d "$2" ]; then
-        log error "ansible.com/v1alpha1/extra_vars: build output directory not found: $2"
-        return
-    fi
-
-    local -r v=$(yq '.spec.extra_vars' < "$1")
-    if [ "$v" == "null" ]; then
+    local -r v=$(api_ansible_v1alpha1__manifest "$1" '.spec.extra_vars')
+    if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/extra_vars: extra_vars field not found"
         return
     fi
