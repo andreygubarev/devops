@@ -60,8 +60,8 @@ build_environment() {
 }
 
 build() {
-    api::template_config "$(build_config)
-    api::template "$(build_config)" "$(build_dist)
+    api::template_config "$(build_config)"
+    api::template "$(build_config)" "$(build_dist)"
     build_environment
     build_source
 
