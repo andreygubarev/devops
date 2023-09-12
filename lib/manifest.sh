@@ -64,3 +64,23 @@ manifest_set_context() {
 manifest_set_api_context() {
     api_set_context "$manifest_apiversion"
 }
+
+manifest_query() {
+    if [ ! -f "$manifest_path" ]; then
+        log error "ansible.com/v1alpha1/manifest: manifest not found: $1"
+        return
+    fi
+
+    local -r query="$1"
+    if [ -z "$query" ]; then
+        log error "ansible.com/v1alpha1/manifest: query not found"
+        return
+    fi
+
+    local -r v=$(yq "$query" < "$manifest_path")
+    if [ "$v" == "null" ]; then
+        log warn "ansible.com/v1alpha1/manifest: field not found: $query"
+        return
+    fi
+    echo "$v"
+}
