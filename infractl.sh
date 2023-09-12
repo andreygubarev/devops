@@ -3,11 +3,18 @@ set -euo pipefail
 
 ### Globals ###################################################################
 INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 
 ### Libarary ##################################################################
 
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
+
+# shellcheck source=lib/manifest.sh
+source "$INFRACTL_PATH/lib/manifest.sh"
+
+# shellcheck source=lib/build.sh
+source "$INFRACTL_PATH/lib/build.sh"
 
 # shellcheck source=lib/templates.sh
 source "$INFRACTL_PATH/lib/templates.sh"
@@ -25,146 +32,6 @@ source "$INFRACTL_PLUGINS_PATH/api/ansible/v1alpha1/plugin.sh"
 source "$INFRACTL_PLUGINS_PATH/api/terraform/v1alpha1/plugin.sh"
 
 
-### Runtime ###################################################################
-INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
-
-### Manifests #################################################################
-manifest_get_path() {
-    if [ -f "$1" ]; then
-        readlink -f "$1"
-    fi
-}
-
-manifest_get_dir() {
-    dirname "$1"
-}
-
-manifest_get_apiversion() {
-    yq '.apiVersion' < "$1"
-}
-
-manifest_get_kind() {
-    yq '.kind' < "$1"
-}
-
-manifest_get_name() {
-    yq '.metadata.name' < "$1"
-}
-
-manifest_get_version() {
-    pushd "$(manifest_get_dir "$1")" > /dev/null
-    echo "$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD -- || echo "-dirty")"
-    popd > /dev/null
-}
-
-manifest_set_context() {
-    manifest_path=$(manifest_get_path "$1")
-    if [ ! -f "$manifest_path" ]; then
-        log critical "manifest not found: $1"
-    fi
-
-    manifest_dir=$(manifest_get_dir "$manifest_path")
-    if [ ! -d "$manifest_dir" ]; then
-        log critical "manifest directory not found: $manifest_dir"
-    fi
-
-    manifest_apiversion=$(manifest_get_apiversion "$manifest_path")
-    if [ "$manifest_apiversion" == "null" ]; then
-        log critical "manifest '.apiVersion' not found"
-    fi
-
-    manifest_kind=$(manifest_get_kind "$manifest_path")
-    if [ "$manifest_kind" == "null" ]; then
-        log critical "manifest '.kind' not found"
-    fi
-
-    manifest_name=$(manifest_get_name "$manifest_path")
-    if [ "$manifest_name" == "null" ]; then
-        log critical "manifest '.metadata.name' not found"
-    fi
-
-    # FIXME: Update this to use the version from the manifest
-    manifest_version=$(manifest_get_version "$manifest_dir")
-    if [ "$manifest_version" == "null" ]; then
-        log critical "manifest version not found"
-    fi
-}
-
-manifest_set_api_context() {
-    api_set_context "$manifest_apiversion"
-}
-
-### Build #####################################################################
-
-build_set_context() {
-    log debug "setting build context"
-
-    build_source_provider=$(build_get_source_provider)
-    build_source_path=$(build_get_source_path)
-
-    build_dist="$manifest_dir/.infractl/dist/$manifest_name"
-    build_version="$manifest_version"
-    build_config="$build_dist/$build_version.config.yaml"
-    build_output="$build_dist/$build_version"
-
-    mkdir -p "$build_dist"
-}
-
-build_get_source_provider() {
-    echo "$manifest_kind" | cut -d':' -f1
-}
-
-build_get_source_path() {
-    echo "$manifest_kind" | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
-}
-
-build_source_using_file() {
-    log info "copying source: $build_source_path"
-
-    local source=$build_source_path
-
-    if [[ $source != /* ]]; then
-        source="$manifest_dir/$source"
-    fi
-
-    if [ -d "$source" ]; then
-        source="${source%/}/"
-    fi
-
-    rm -rf "$build_output/src"
-    cp -r "$source" "$build_output/src/"
-}
-
-build_source() {
-    cp "$manifest_path" "$build_output/manifest.yaml"
-
-    case "$build_source_provider" in
-        "file")
-            build_source_using_file
-            ;;
-        *)
-            log critical "Unsupported source provider: $build_source_provider"
-            ;;
-    esac
-}
-
-build_environment() {
-    if [ -f "$manifest_dir/.envrc" ]; then
-        cat "$manifest_dir/.envrc" >> "$build_output/.envrc"
-    fi
-    direnv allow "$build_output"
-}
-
-build() {
-    build_set_context
-    api "template_config" "$build_config"
-    api "template" "$build_config" "$build_dist"
-    build_environment
-    build_source
-
-    echo "$build_output"
-}
-
 ### Ansible ###################################################################
 
 ansible_run() {
@@ -179,7 +46,6 @@ ansible_run() {
 
 ### Terraform #################################################################
 
-### Terraform | API ###########################################################
 terraform_run() {
     build_output=$(build)
     pushd "$build_output"
