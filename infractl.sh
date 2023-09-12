@@ -207,19 +207,6 @@ ansible_run() {
 
 ### Terraform #################################################################
 ### Terraform | Versions ######################################################
-terragrunt_get_current_version() {
-    terragrunt --version | awk '{print $3}' | cut -d'v' -f2
-}
-
-terragrunt_set_version() {
-    local -r terragrunt_version=$(api "settings_terragrunt_version" "$manifest_path")
-    local -r current_terragrunt_version=$(terragrunt_get_current_version)
-
-    if [ "$terragrunt_version" != "$current_terragrunt_version" ]; then
-        tgenv install "$terragrunt_version"
-        tgenv use "$terragrunt_version"
-    fi
-}
 
 ### Terraform | Build #########################################################
 
@@ -261,7 +248,7 @@ terraform_run() {
     eval "$(direnv export bash)"
 
     api "set_terraform_version" "$manifest_path"
-    terragrunt_set_version
+    api "set_terragrunt_version" "$manifest_path"
 
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         log info "running: terragrunt plan"
