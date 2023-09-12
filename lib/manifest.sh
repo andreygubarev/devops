@@ -5,21 +5,14 @@ new_manifest() {
     if [ ! -f "$v" ]; then
         log critical "manifest: not found: $1"
     fi
+    manifest="$v"
+    log debug "manifest: set $manifest"
 
-    new_context
-    context_set "manifest" "$1"
-    context_set "manifest_path" "$v"
-    context_set "manifest_dir" "$(manifest_dir)"
-    context_set "manifest_apiversion" "$(manifest_apiversion)"
-    context_set "manifest_kind" "$(manifest_kind)"
-    context_set "manifest_name" "$(manifest_name)"
-    context_set "manifest_version" "$(manifest_version)"
-
-    new_api "$(manifest_apiversion)"
+    api_set "$(manifest_apiversion)"
 }
 
 manifest_path() {
-    context_get "manifest_path"
+    echo "$manifest"
 }
 
 manifest_dir() {

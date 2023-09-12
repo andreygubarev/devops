@@ -10,9 +10,6 @@ INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
 
-# shellcheck source=lib/context.sh
-source "$INFRACTL_PATH/lib/context.sh"
-
 # shellcheck source=lib/manifest.sh
 source "$INFRACTL_PATH/lib/manifest.sh"
 
