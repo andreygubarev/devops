@@ -108,3 +108,26 @@ api_terraform_v1alpha1__render_template() {
 
     utils::render_template "$template_path" "$template_config" "$template_output"
 }
+
+### Runtime ###################################################################
+
+api_terraform_v1alpha1["run"]=api_terraform_v1alpha1__run
+api_terraform_v1alpha1__run() {
+    build_output=$(build)
+    pushd "$build_output"
+    direnv allow .
+    eval "$(direnv export bash)"
+
+    api::set_terraform_version
+    api::set_terragrunt_version
+
+    if [ "$INFRACTL_DRYRUN" == "true" ]; then
+        log info "running: terragrunt plan"
+        terragrunt plan
+    else
+        log info "running: terragrunt apply"
+        terragrunt apply
+    fi
+
+    popd
+}

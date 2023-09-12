@@ -89,3 +89,16 @@ api_ansible_v1alpha1__render_template() {
 
     utils::render_template "$template_path" "$template_config" "$template_output"
 }
+
+### Runtime ###################################################################
+
+api_ansible_v1alpha1["run"]=api_ansible_v1alpha1__run
+api_ansible_v1alpha1__run() {
+    build_output=$(build)
+    pushd "$build_output"
+    direnv allow .
+    eval "$(direnv export bash)"
+
+    echo "ansible-playbook $(api::inventory) $(api::dryrun) $(api::extra_vars "$(build_output)") src/$(api::playbook)"
+    popd
+}

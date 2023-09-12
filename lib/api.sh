@@ -8,7 +8,6 @@ new_api() {
     local -r apiversion="$1"
     log info "api: new $apiversion"
 
-
     case "$apiversion" in
         "ansible.com/v1alpha1")
             # shellcheck source=../plugins/api/ansible/v1alpha1/plugin.sh

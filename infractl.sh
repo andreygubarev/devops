@@ -22,40 +22,6 @@ source "$INFRACTL_PATH/lib/build.sh"
 # shellcheck source=lib/api.sh
 source "$INFRACTL_PATH/lib/api.sh"
 
-### Ansible ###################################################################
-
-ansible_run() {
-    build_output=$(build)
-    pushd "$build_output"
-    direnv allow .
-    eval "$(direnv export bash)"
-
-    echo "ansible-playbook $(api::inventory) $(api::dryrun) $(api::extra_vars "$(build_output)") src/$(api::playbook)"
-    popd
-}
-
-### Terraform #################################################################
-
-terraform_run() {
-    build_output=$(build)
-    pushd "$build_output"
-    direnv allow .
-    eval "$(direnv export bash)"
-
-    api::set_terraform_version
-    api::set_terragrunt_version
-
-    if [ "$INFRACTL_DRYRUN" == "true" ]; then
-        log info "running: terragrunt plan"
-        terragrunt plan
-    else
-        log info "running: terragrunt apply"
-        terragrunt apply
-    fi
-
-    popd
-}
-
 ### Command line #############################################################
 
 command_build() {
@@ -108,17 +74,7 @@ command_run() {
         INFRACTL_DRYRUN="true"
     fi
 
-    case "$(manifest_apiversion)" in
-        "terraform.io/v1alpha1")
-            terraform_run
-            ;;
-        "ansible.com/v1alpha1")
-            ansible_run
-            ;;
-        *)
-            log critical "unsupported apiVersion: $(manifest_apiversion)"
-            ;;
-    esac
+    api::run
 }
 
 command_clean() {
