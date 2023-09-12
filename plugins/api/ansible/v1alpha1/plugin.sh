@@ -20,7 +20,7 @@ api_ansible_v1alpha1__settings_python_version() {
 
 api_ansible_v1alpha1["settings_python_requirements"]=api_ansible_v1alpha1__settings_python_requirements
 api_ansible_v1alpha1__settings_python_requirements() {
-    manifest_query '.metadata.annotations["python.org/requirements"]' | xargs echo
+    manifest_query '.metadata.annotations["python.org/requirements"]' | yq -r '.[]' | xargs echo
 }
 
 
