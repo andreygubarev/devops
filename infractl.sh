@@ -155,20 +155,6 @@ build_environment() {
     direnv allow "$build_output"
 }
 
-build_template_config() {
-    case "$manifest_apiversion" in
-        "terraform.io/v1alpha1")
-            terraform_template_config "$build_config"
-            ;;
-        "ansible.com/v1alpha1")
-            api "template_config" "$build_config"
-            ;;
-        *)
-            log critical "unsupported apiVersion: $manifest_apiversion"
-            ;;
-    esac
-}
-
 build_template() {
     case "$manifest_apiversion" in
         "terraform.io/v1alpha1")
@@ -185,7 +171,7 @@ build_template() {
 
 build() {
     build_set_context
-    build_template_config
+    api "template_config" "$build_config"
     build_template
     build_environment
     build_source
@@ -194,7 +180,7 @@ build() {
 }
 
 ### Ansible ###################################################################
-### Ansible | API #############################################################
+
 ansible_run() {
     build_output=$(build)
     pushd "$build_output"
@@ -206,39 +192,6 @@ ansible_run() {
 }
 
 ### Terraform #################################################################
-### Terraform | Versions ######################################################
-
-### Terraform | Build #########################################################
-
-terraform_template_config_get_metadata_labels() {
-    yq '.metadata.labels | keys | .[]' < "$manifest_path" | xargs echo
-}
-
-terraform_template_config_get_remote_state_backend() {
-    yq '.metadata.annotations["terraform.io/remote-state-backend"]' < "$manifest_path"
-}
-
-terraform_template_config_get_remote_state_region() {
-    yq '.metadata.annotations["terraform.io/remote-state-region"]' < "$manifest_path"
-}
-
-terraform_template_config_get_remote_locking() {
-    yq '.metadata.annotations["terraform.io/remote-state-locking"]' < "$manifest_path"
-}
-
-terraform_template_config() {
-    cat <<- EOF > "$1"
-default_context:
-    name: "$manifest_name"
-    version: "$manifest_version"
-    terraform_metadata_labels: "$(terraform_template_config_get_metadata_labels)"
-    terraform_remote_state_backend: "$(terraform_template_config_get_remote_state_backend)"
-    terraform_remote_state_locking: "$(terraform_template_config_get_remote_locking)"
-    terraform_remote_state_region: "$(terraform_template_config_get_remote_state_region)"
-    terraform_version: "$(api "settings_terraform_version" "$manifest_path")"
-    terragrunt_version: "$(api "settings_terragrunt_version" "$manifest_path")"
-EOF
-}
 
 ### Terraform | API ###########################################################
 terraform_run() {

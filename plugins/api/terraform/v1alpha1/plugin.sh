@@ -2,35 +2,57 @@
 API_TERRAFORM_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/terraform/v1alpha1"
 declare -A api_terraform_v1alpha1
 
-### Settings ##################################################################
-api_terraform_v1alpha1["settings_terraform_version"]=api_terraform_v1alpha1__settings_terraform_version
-api_terraform_v1alpha1__settings_terraform_version() {
+### Manifest ##################################################################
+api_terraform_v1alpha1["manifest"]=api_terraform_v1alpha1__manifest
+api_terraform_v1alpha1__manifest() {
     if [ ! -f "$1" ]; then
-        log error "terraform.io/v1alpha1/settings_terraform_version: manifest not found: $1"
+        log error "terraform.io/v1alpha1/manifest: manifest not found: $1"
         return
     fi
 
-    local -r v=$(yq '.metadata.annotations["terraform.io/version"]' < "$1")
+    if [ -z "$2" ]; then
+        log error "terraform.io/v1alpha1/manifest: query not found"
+        return
+    fi
+
+    local -r v=$(yq "$2" < "$1")
     if [ "$v" == "null" ]; then
-        log warn "terraform.io/v1alpha1/settings_terraform_version: terraform version not found"
+        log warn "terraform.io/v1alpha1/manifest: field not found: $2"
         return
     fi
     echo "$v"
 }
 
+### Settings ##################################################################
+api_terraform_v1alpha1["settings_terraform_version"]=api_terraform_v1alpha1__settings_terraform_version
+api_terraform_v1alpha1__settings_terraform_version() {
+    api_terraform_v1alpha1__manifest "$1" '.metadata.annotations["terraform.io/version"]'
+}
+
 api_terraform_v1alpha1["settings_terragrunt_version"]=api_terraform_v1alpha1__settings_terragrunt_version
 api_terraform_v1alpha1__settings_terragrunt_version() {
-    if [ ! -f "$1" ]; then
-        log error "terraform.io/v1alpha1/settings_terragrunt_version: manifest not found: $1"
-        return
-    fi
+    api_terraform_v1alpha1__manifest "$1" '.metadata.annotations["terragrunt.gruntwork.io/version"]'
+}
 
-    local -r v=$(yq '.metadata.annotations["terragrunt.gruntwork.io/version"]' < "$1")
-    if [ "$v" == "null" ]; then
-        log warn "terraform.io/v1alpha1/settings_terragrunt_version: terragrunt version not found"
-        return
-    fi
-    echo "$v"
+api_terraform_v1alpha1["labels"]=api_terraform_v1alpha1__labels
+api_terraform_v1alpha1__labels() {
+    local -r v=$(api_terraform_v1alpha1__manifest "$1" '.metadata.labels | keys | .[]')
+    echo "$v" | xargs echo
+}
+
+api_terraform_v1alpha1["settings_remote_state_backend"]=api_terraform_v1alpha1__settings_remote_state_backend
+api_terraform_v1alpha1__settings_remote_state_backend() {
+    api_terraform_v1alpha1__manifest "$1" '.metadata.annotations["terraform.io/remote-state-backend"]'
+}
+
+api_terraform_v1alpha1["settings_remote_state_locking"]=api_terraform_v1alpha1__settings_remote_state_locking
+api_terraform_v1alpha1__settings_remote_state_locking() {
+    api_terraform_v1alpha1__manifest "$1" '.metadata.annotations["terraform.io/remote-state-locking"]'
+}
+
+api_terraform_v1alpha1["settings_remote_state_region"]=api_terraform_v1alpha1__settings_remote_state_region
+api_terraform_v1alpha1__settings_remote_state_region() {
+    api_terraform_v1alpha1__manifest "$1" '.metadata.annotations["terraform.io/remote-state-region"]'
 }
 
 ### Runtime ###################################################################
@@ -92,3 +114,21 @@ api_terraform_v1alpha1__set_terragrunt_version() {
         tgenv use "$terragrunt_version"
     fi
 }
+
+### Template ##################################################################
+
+api_terraform_v1alpha1["template_config"]=api_terraform_v1alpha1__template_config
+api_terraform_v1alpha1__template_config() {
+    cat <<- EOF > "$1"
+default_context:
+    name: "$manifest_name"
+    version: "$manifest_version"
+    terraform_metadata_labels: "$(api_terraform_v1alpha1__labels "$manifest_path")"
+    terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend "$manifest_path")"
+    terraform_remote_state_locking: "$(api_terraform_v1alpha1__settings_remote_state_locking "$manifest_path")"
+    terraform_remote_state_region: "$(api_terraform_v1alpha1__settings_remote_state_region "$manifest_path")"
+    terraform_version: "$(api_terraform_v1alpha1__settings_terraform_version "$manifest_path")"
+    terragrunt_version: "$(api_terraform_v1alpha1__settings_terragrunt_version "$manifest_path")"
+EOF
+}
+
