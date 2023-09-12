@@ -219,15 +219,6 @@ ansible_get_dryrun() {
     fi
 }
 
-ansible_get_settings_inventory() {
-    local -r v=$(yq '.metadata.annotations["ansible.com/inventory"]' < "$manifest_path")
-    if [ "$v" == "null" ]; then
-        echo "hosts"
-    else
-        echo "$v"
-    fi
-}
-
 ansible_get_settings_roles_path() {
     local -r v=$(yq '.metadata.annotations["ansible.com/roles-path"]' < "$manifest_path")
     if [ "$v" == "null" ]; then
@@ -235,11 +226,6 @@ ansible_get_settings_roles_path() {
     else
         echo "$v"
     fi
-}
-
-
-ansible_get_python_version() {
-    yq '.metadata.annotations["python.org/version"]' < "$manifest_path"
 }
 
 ansible_get_python_requirements() {
@@ -251,10 +237,10 @@ ansible_template_config() {
 default_context:
     name: "$manifest_name"
     version: "$manifest_version"
-    ansible_inventory: "$(ansible_get_settings_inventory)"
+    ansible_inventory: "$(api "inventory" "$manifest_path")"
     ansible_roles_path: "$(ansible_get_settings_roles_path)"
-    ansible_version: "$(api "get_version" "$manifest_path")"
-    python_version: "$(ansible_get_python_version)"
+    ansible_version: "$(api "settings_ansible_version" "$manifest_path")"
+    python_version: "$(api "settings_python_version" "$manifest_path")"
     python_requirements: "$(ansible_get_python_requirements)"
 EOF
 }
@@ -266,7 +252,7 @@ ansible_run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(api "get_inventory" "$manifest_path") $(ansible_get_dryrun) $(api "get_extra_vars") src/$(api "get_playbook" "$manifest_path")"
+    echo "ansible-playbook $(api "inventory" "$manifest_path") $(ansible_get_dryrun) $(api "extra_vars" "$manifest_path" "$build_output") src/$(api "playbook" "$manifest_path")"
     popd
 }
 

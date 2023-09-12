@@ -47,6 +47,7 @@ log() {
         echo "WARNING: $message" >&2
     elif [ "$loglevel" == "error" ] && [ "$level" -le 40 ]; then
         echo "ERROR: $message" >&2
+        exit 1
     elif [ "$loglevel" == "critical" ] && [ "$level" -le 50 ]; then
         echo "CRITICAL: $message" >&2
         exit 1

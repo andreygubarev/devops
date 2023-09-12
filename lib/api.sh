@@ -26,5 +26,10 @@ api() {
     local -r api_func="$1"
     shift
 
+    if [ -z "${apis[$api_func]+exists}" ]; then
+        log critical "API does not exist: $api_func"
+        return
+    fi
+
     "${apis[$api_func]}" "$@"
 }

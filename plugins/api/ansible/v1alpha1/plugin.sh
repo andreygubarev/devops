@@ -2,9 +2,14 @@
 declare -A api_ansible_v1alpha1
 
 ### Settings ##################################################################
-# shellcheck disable=SC2034
-api_ansible_v1alpha1["get_version"]=api_ansible_v1alpha1_get_version
-api_ansible_v1alpha1_get_version() {
+api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1_settings_ansible_version
+api_ansible_v1alpha1_settings_ansible_version() {
+    if [ ! -f "$1" ]; then
+        log error "ansible.com/v1alpha1/settings_ansible_version: manifest not found: $1"
+        echo ""
+        return
+    fi
+
     local -r v=$(yq '.metadata.annotations["ansible.com/version"]' < "$1")
     if [ "$v" == "null" ]; then
         echo ""
@@ -13,12 +18,34 @@ api_ansible_v1alpha1_get_version() {
     fi
 }
 
-### Inventory #################################################################
-# shellcheck disable=SC2034
-api_ansible_v1alpha1["get_inventory"]=api_ansible_v1alpha1_get_inventory
-api_ansible_v1alpha1_get_inventory() {
-    local -r v=$(yq '.spec.ansible_inventory' < "$1")
+api_ansible_v1alpha1["settings_python_version"]=api_ansible_v1alpha1_settings_python_version
+api_ansible_v1alpha1_settings_python_version() {
+    if [ ! -f "$1" ]; then
+        log error "ansible.com/v1alpha1/settings_python_version: manifest not found: $1"
+        echo ""
+        return
+    fi
+
+    local -r v=$(yq '.metadata.annotations["python.org/version"]' < "$1")
     if [ "$v" == "null" ]; then
+        echo ""
+    else
+        echo "$v"
+    fi
+}
+
+### Inventory #################################################################
+api_ansible_v1alpha1["inventory"]=api_ansible_v1alpha1_inventory
+api_ansible_v1alpha1_inventory() {
+    if [ ! -f "$1" ]; then
+        log error "ansible.com/v1alpha1/inventory: manifest not found: $1"
+        echo ""
+        return
+    fi
+
+    local -r v=$(yq '.spec.inventory' < "$1")
+    if [ "$v" == "null" ]; then
+        log warn "ansible.com/v1alpha1/inventory: inventory not found"
         echo ""
     else
         echo "--inventory $v"
@@ -27,11 +54,17 @@ api_ansible_v1alpha1_get_inventory() {
 
 ### Playbook ##################################################################
 # shellcheck disable=SC2034
-api_ansible_v1alpha1["get_playbook"]=api_ansible_v1alpha1_get_playbook
-api_ansible_v1alpha1_get_playbook() {
-    local -r v=$(yq '.spec.ansible_playbook' < "$1")
+api_ansible_v1alpha1["playbook"]=api_ansible_v1alpha1_playbook
+api_ansible_v1alpha1_playbook() {
+    if [ ! -f "$1" ]; then
+        log error "ansible.com/v1alpha1/playbook: manifest not found: $1"
+        echo ""
+        return
+    fi
+
+    local -r v=$(yq '.spec.playbook' < "$1")
     if [ "$v" == "null" ]; then
-        echo "Ansible playbook not found"
+        log error "ansible.com/v1alpha1/playbook: playbook not found"
         exit 1
     else
         echo "$v"
@@ -39,22 +72,25 @@ api_ansible_v1alpha1_get_playbook() {
 }
 
 # shellcheck disable=SC2034
-api_ansible_v1alpha1["get_extra_vars"]=api_ansible_v1alpha1_get_extra_vars
-api_ansible_v1alpha1_get_extra_vars() {
-    local -r extra_vars=$(yq '.spec.ansible_extra_vars' < "$manifest_path")
-
-    local extra_vars_file=""
-    if [ -n "$extra_vars" ]; then
-        local extra_vars_file="$build_output/extra_vars.yaml"
-        cat <<- EOF > "$extra_vars_file"
-$extra_vars
-EOF
+api_ansible_v1alpha1["extra_vars"]=api_ansible_v1alpha1_extra_vars
+api_ansible_v1alpha1_extra_vars() {
+    if [ ! -f "$1" ]; then
+        log error "ansible.com/v1alpha1/extra_vars: manifest not found: $1"
+        return
     fi
 
-    local extra_vars_arg=""
-    if [ -n "$extra_vars_file" ]; then
-        local extra_vars_arg="--extra-vars @$extra_vars_file"
+    if [ ! -d "$2" ]; then
+        log error "ansible.com/v1alpha1/extra_vars: build output directory not found: $2"
+        return
     fi
 
-    echo "$extra_vars_arg"
+    local -r v=$(yq '.spec.extra_vars' < "$1")
+    if [ "$v" == "null" ]; then
+        log warn "ansible.com/v1alpha1/extra_vars: extra_vars field not found"
+        return
+    fi
+
+    local f="$2/extra_vars.yaml"
+    echo "$v" > "$f"
+    echo "--extra-vars @$f"
 }
