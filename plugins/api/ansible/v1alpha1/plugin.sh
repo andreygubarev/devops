@@ -3,8 +3,8 @@ API_ANSIBLE_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/ansible/v1alpha1"
 declare -A api_ansible_v1alpha1
 
 ### Settings ##################################################################
-api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1_settings_ansible_version
-api_ansible_v1alpha1_settings_ansible_version() {
+api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1__settings_ansible_version
+api_ansible_v1alpha1__settings_ansible_version() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/settings_ansible_version: manifest not found: $1"
         return
@@ -17,8 +17,8 @@ api_ansible_v1alpha1_settings_ansible_version() {
     echo "$v"
 }
 
-api_ansible_v1alpha1["settings_ansible_roles"]=api_ansible_v1alpha1_settings_ansible_roles
-api_ansible_v1alpha1_settings_ansible_roles() {
+api_ansible_v1alpha1["settings_ansible_roles"]=api_ansible_v1alpha1__settings_ansible_roles
+api_ansible_v1alpha1__settings_ansible_roles() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/settings_ansible_roles: manifest not found: $1"
         return
@@ -33,8 +33,8 @@ api_ansible_v1alpha1_settings_ansible_roles() {
 }
 
 
-api_ansible_v1alpha1["settings_python_version"]=api_ansible_v1alpha1_settings_python_version
-api_ansible_v1alpha1_settings_python_version() {
+api_ansible_v1alpha1["settings_python_version"]=api_ansible_v1alpha1__settings_python_version
+api_ansible_v1alpha1__settings_python_version() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/settings_python_version: manifest not found: $1"
         return
@@ -48,8 +48,8 @@ api_ansible_v1alpha1_settings_python_version() {
     echo "$v"
 }
 
-api_ansible_v1alpha1["settings_python_requirements"]=api_ansible_v1alpha1_settings_python_requirements
-api_ansible_v1alpha1_settings_python_requirements() {
+api_ansible_v1alpha1["settings_python_requirements"]=api_ansible_v1alpha1__settings_python_requirements
+api_ansible_v1alpha1__settings_python_requirements() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/settings_python_requirements: manifest not found: $1"
         return
@@ -65,8 +65,8 @@ api_ansible_v1alpha1_settings_python_requirements() {
 
 
 ### Inventory #################################################################
-api_ansible_v1alpha1["inventory"]=api_ansible_v1alpha1_inventory
-api_ansible_v1alpha1_inventory() {
+api_ansible_v1alpha1["inventory"]=api_ansible_v1alpha1__inventory
+api_ansible_v1alpha1__inventory() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/inventory: manifest not found: $1"
         return
@@ -81,8 +81,8 @@ api_ansible_v1alpha1_inventory() {
 }
 
 ### Playbook ##################################################################
-api_ansible_v1alpha1["playbook"]=api_ansible_v1alpha1_playbook
-api_ansible_v1alpha1_playbook() {
+api_ansible_v1alpha1["playbook"]=api_ansible_v1alpha1__playbook
+api_ansible_v1alpha1__playbook() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/playbook: manifest not found: $1"
         return
@@ -96,8 +96,8 @@ api_ansible_v1alpha1_playbook() {
     echo "$v"
 }
 
-api_ansible_v1alpha1["extra_vars"]=api_ansible_v1alpha1_extra_vars
-api_ansible_v1alpha1_extra_vars() {
+api_ansible_v1alpha1["extra_vars"]=api_ansible_v1alpha1__extra_vars
+api_ansible_v1alpha1__extra_vars() {
     if [ ! -f "$1" ]; then
         log error "ansible.com/v1alpha1/extra_vars: manifest not found: $1"
         return
@@ -119,16 +119,16 @@ api_ansible_v1alpha1_extra_vars() {
     echo "--extra-vars @$f"
 }
 
-api_ansible_v1alpha1["dryrun"]=api_ansible_v1alpha1_dryrun
-api_ansible_v1alpha1_dryrun() {
+api_ansible_v1alpha1["dryrun"]=api_ansible_v1alpha1__dryrun
+api_ansible_v1alpha1__dryrun() {
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         echo "--check"
     fi
 }
 
 ### Template ##################################################################
-api_ansible_v1alpha1["template_config"]=api_ansible_v1alpha1_template_config
-api_ansible_v1alpha1_template_config() {
+api_ansible_v1alpha1["template_config"]=api_ansible_v1alpha1__template_config
+api_ansible_v1alpha1__template_config() {
     cat <<- EOF > "$1"
 default_context:
     name: "$manifest_name"
@@ -141,8 +141,8 @@ default_context:
 EOF
 }
 
-api_ansible_v1alpha1["template"]=api_ansible_v1alpha1_template
-api_ansible_v1alpha1_template() {
+api_ansible_v1alpha1["template"]=api_ansible_v1alpha1__template
+api_ansible_v1alpha1__template() {
     local -r template_path="$API_ANSIBLE_V1ALPHA1_PATH/template"
     local -r template_config="$1"
     local -r template_output="$2"

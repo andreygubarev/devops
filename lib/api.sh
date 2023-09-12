@@ -8,11 +8,18 @@ api_set_context() {
 
     declare -gA apis
     case "$apiversion" in
-        ansible.com/v1alpha1)
+        "ansible.com/v1alpha1")
             # shellcheck disable=SC2154
             for key in "${!api_ansible_v1alpha1[@]}"; do
                 apis["$key"]="${api_ansible_v1alpha1[$key]}"
                 log debug "apis[$key] -> ${api_ansible_v1alpha1[$key]}"
+            done
+            ;;
+        "terraform.io/v1alpha1")
+            # shellcheck disable=SC2154
+            for key in "${!api_terraform_v1alpha1[@]}"; do
+                apis["$key"]="${api_terraform_v1alpha1[$key]}"
+                log debug "apis[$key] -> ${api_terraform_v1alpha1[$key]}"
             done
             ;;
         *)

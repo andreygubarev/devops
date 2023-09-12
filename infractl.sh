@@ -207,10 +207,6 @@ ansible_run() {
 
 ### Terraform #################################################################
 ### Terraform | Versions ######################################################
-terraform_get_version() {
-    yq '.metadata.annotations["terraform.io/version"]' < "$manifest_path"
-}
-
 terraform_get_current_version() {
     terraform version | head -n1 | cut -d' ' -f2 | cut -d'v' -f2
 }
@@ -270,7 +266,7 @@ default_context:
     terraform_remote_state_backend: "$(terraform_template_config_get_remote_state_backend)"
     terraform_remote_state_locking: "$(terraform_template_config_get_remote_locking)"
     terraform_remote_state_region: "$(terraform_template_config_get_remote_state_region)"
-    terraform_version: "$(terraform_get_version)"
+    terraform_version: $(api "settings_terraform_version" "$manifest_path")"
     terragrunt_version: "$(terragrunt_get_version)"
 EOF
 }
