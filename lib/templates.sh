@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-TEMPLATES_DIR="$INFRACTL_PATH/templates"
 
 template_render() {
     log info "rendering template: $1"
