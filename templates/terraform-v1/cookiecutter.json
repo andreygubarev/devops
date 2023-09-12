@@ -1,0 +1,10 @@
+{
+    "name": "",
+    "version": "",
+    "terraform_metadata_labels": "",
+    "terraform_remote_state_backend": "",
+    "terraform_remote_state_locking": "",
+    "terraform_remote_state_region": "",
+    "terraform_version": "",
+    "terragrunt_version": ""
+}

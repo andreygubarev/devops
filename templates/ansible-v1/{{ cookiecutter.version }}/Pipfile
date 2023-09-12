@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ansible = "=={{ cookiecutter.ansible_version }}"
+{%- set python_requirements = cookiecutter.python_requirements.split() %}
+{%- for requirement in python_requirements %}
+{%- set requirement = requirement.strip().split("==") %}
+{%- if requirement|length == 1 %}
+{{ requirement[0] }} = "*"
+{%- else %}
+{{ requirement[0] }} = "=={{ requirement[1] }}"
+{%- endif %}
+
+{%- endfor %}
+
+[dev-packages]
+
+[requires]
+python_version = "{{ cookiecutter.python_version }}"

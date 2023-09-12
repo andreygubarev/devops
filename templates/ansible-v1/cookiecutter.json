@@ -1,0 +1,9 @@
+{
+    "name": "",
+    "version": "",
+    "ansible_inventory": "hosts",
+    "ansible_roles_path": "roles",
+    "ansible_version": "",
+    "python_version": "",
+    "python_requirements": ""
+}
