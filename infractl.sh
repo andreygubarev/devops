@@ -155,24 +155,10 @@ build_environment() {
     direnv allow "$build_output"
 }
 
-build_template() {
-    case "$manifest_apiversion" in
-        "terraform.io/v1alpha1")
-            template_render "$TEMPLATES_DIR/terraform-v1" "$build_config" "$build_dist"
-            ;;
-        "ansible.com/v1alpha1")
-            api "template" "$build_config" "$build_dist"
-            ;;
-        *)
-            log critical "unsupported apiVersion: $manifest_apiversion"
-            ;;
-    esac
-}
-
 build() {
     build_set_context
     api "template_config" "$build_config"
-    build_template
+    api "template" "$build_config" "$build_dist"
     build_environment
     build_source
 
