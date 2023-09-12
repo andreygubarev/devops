@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+API_ANSIBLE_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/ansible/v1alpha1"
 declare -A api_ansible_v1alpha1
 
 ### Settings ##################################################################
@@ -123,4 +124,28 @@ api_ansible_v1alpha1_dryrun() {
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         echo "--check"
     fi
+}
+
+### Template ##################################################################
+api_ansible_v1alpha1["template_config"]=api_ansible_v1alpha1_template_config
+api_ansible_v1alpha1_template_config() {
+    cat <<- EOF > "$1"
+default_context:
+    name: "$manifest_name"
+    version: "$manifest_version"
+    ansible_inventory: "$(api "inventory" "$manifest_path")"
+    ansible_roles_path: "$(api "settings_ansible_roles" "$manifest_path")"
+    ansible_version: "$(api "settings_ansible_version" "$manifest_path")"
+    python_version: "$(api "settings_python_version" "$manifest_path")"
+    python_requirements: "$(api "settings_python_requirements" "$manifest_path")"
+EOF
+}
+
+api_ansible_v1alpha1["template"]=api_ansible_v1alpha1_template
+api_ansible_v1alpha1_template() {
+    local -r template_path="$API_ANSIBLE_V1ALPHA1_PATH/template"
+    local -r template_config="$1"
+    local -r template_output="$2"
+
+    template_render "$template_path" "$template_config" "$template_output"
 }

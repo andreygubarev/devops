@@ -6,11 +6,14 @@ INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 
 ### Libarary ##################################################################
 
-# shellcheck source=lib/api.sh
-source "$INFRACTL_PATH/lib/api.sh"
-
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
+
+# shellcheck source=lib/templates.sh
+source "$INFRACTL_PATH/lib/templates.sh"
+
+# shellcheck source=lib/api.sh
+source "$INFRACTL_PATH/lib/api.sh"
 
 ### Plugins ###################################################################
 INFRACTL_PLUGINS_PATH="$INFRACTL_PATH/plugins"
@@ -24,27 +27,6 @@ source "$INFRACTL_PLUGINS_PATH/api/terraform/v1alpha1/plugin.sh"
 
 ### Runtime ###################################################################
 INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
-
-### Templates #################################################################
-TEMPLATES_DIR="$INFRACTL_PATH/templates"
-
-template_render() {
-    log info "rendering template: $1"
-
-    local -r template_name="$1"
-    local -r template_config="$2"
-    local -r template_output="$3"
-
-    if ! cookiecutter \
-        --no-input \
-        --overwrite-if-exists \
-        --config-file "$template_config" \
-        --output-dir "$template_output" \
-        "$TEMPLATES_DIR/$template_name"
-    then
-        log critical "failed to render template: $template_name"
-    fi
-}
 
 ### Manifests #################################################################
 manifest_get_path() {
@@ -179,7 +161,7 @@ build_template_config() {
             terraform_template_config "$build_config"
             ;;
         "ansible.com/v1alpha1")
-            ansible_template_config "$build_config"
+            api "template_config" "$build_config"
             ;;
         *)
             log critical "unsupported apiVersion: $manifest_apiversion"
@@ -190,10 +172,10 @@ build_template_config() {
 build_template() {
     case "$manifest_apiversion" in
         "terraform.io/v1alpha1")
-            template_render "terraform-v1" "$build_config" "$build_dist"
+            template_render "$TEMPLATES_DIR/terraform-v1" "$build_config" "$build_dist"
             ;;
         "ansible.com/v1alpha1")
-            template_render "ansible-v1" "$build_config" "$build_dist"
+            api "template" "$build_config" "$build_dist"
             ;;
         *)
             log critical "unsupported apiVersion: $manifest_apiversion"
@@ -212,21 +194,6 @@ build() {
 }
 
 ### Ansible ###################################################################
-### Ansible | Build ###########################################################
-
-ansible_template_config() {
-    cat <<- EOF > "$1"
-default_context:
-    name: "$manifest_name"
-    version: "$manifest_version"
-    ansible_inventory: "$(api "inventory" "$manifest_path")"
-    ansible_roles_path: "$(api "settings_ansible_roles" "$manifest_path")"
-    ansible_version: "$(api "settings_ansible_version" "$manifest_path")"
-    python_version: "$(api "settings_python_version" "$manifest_path")"
-    python_requirements: "$(api "settings_python_requirements" "$manifest_path")"
-EOF
-}
-
 ### Ansible | API #############################################################
 ansible_run() {
     build_output=$(build)
