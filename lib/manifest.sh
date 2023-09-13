@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# namespace: manifest
 
 manifest::new() {
     local -r v=$(readlink -f "$1")
