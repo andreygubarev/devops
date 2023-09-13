@@ -3,13 +3,11 @@ API_TERRAFORM_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/terraform/v1alpha1"
 declare -gA api_terraform_v1alpha1
 
 ### Settings ##################################################################
-api_terraform_v1alpha1["settings_terraform_version"]=api_terraform_v1alpha1__settings_terraform_version
-api_terraform_v1alpha1__settings_terraform_version() {
+terraform::settings::version() {
     resource::query '.metadata.annotations["terraform.io/version"]'
 }
 
-api_terraform_v1alpha1["settings_terragrunt_version"]=api_terraform_v1alpha1__settings_terragrunt_version
-api_terraform_v1alpha1__settings_terragrunt_version() {
+terraform::settings::terragrunt_version() {
     resource::query '.metadata.annotations["terragrunt.gruntwork.io/version"]'
 }
 
@@ -46,7 +44,7 @@ api_terraform_v1alpha1__system_terraform_version() {
 
 api_terraform_v1alpha1["set_terraform_version"]=api_terraform_v1alpha1__set_terraform_version
 api_terraform_v1alpha1__set_terraform_version() {
-    local -r terraform_version=$(api_terraform_v1alpha1__settings_terraform_version)
+    local -r terraform_version=$(terraform::settings::version)
     local -r current_terraform_version=$(api_terraform_v1alpha1__system_terraform_version)
 
     if [ "$terraform_version" != "$current_terraform_version" ]; then
@@ -70,7 +68,7 @@ api_terraform_v1alpha1__system_terragrunt_version() {
 
 api_terraform_v1alpha1["set_terragrunt_version"]=api_terraform_v1alpha1__set_terragrunt_version
 api_terraform_v1alpha1__set_terragrunt_version() {
-    local -r terragrunt_version=$(api_terraform_v1alpha1__settings_terragrunt_version)
+    local -r terragrunt_version=$(terraform::settings::terragrunt_version)
     local -r current_terragrunt_version=$(api_terraform_v1alpha1__system_terragrunt_version)
 
     if [ "$terragrunt_version" != "$current_terragrunt_version" ]; then
@@ -94,8 +92,8 @@ default_context:
     terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend)"
     terraform_remote_state_locking: "$(api_terraform_v1alpha1__settings_remote_state_locking)"
     terraform_remote_state_region: "$(api_terraform_v1alpha1__settings_remote_state_region)"
-    terraform_version: "$(api_terraform_v1alpha1__settings_terraform_version)"
-    terragrunt_version: "$(api_terraform_v1alpha1__settings_terragrunt_version)"
+    terraform_version: "$(terraform::settings::version)"
+    terragrunt_version: "$(terraform::settings::terragrunt_version)"
 EOF
 }
 
