@@ -2,21 +2,25 @@
 # namespace: snapshot
 
 snapshot::path() {
-    echo "$snapshot_path/$INFRACTL_WORKSPACE/$snapshot_hash"
+    echo "$snapshot_dir/$INFRACTL_WORKSPACE/$snapshot_hash"
+}
+
+snapshot::resources() {
+    echo "$(snapshot::path)/resources"
 }
 
 snapshot::new() {
     snapshot_file="$1"
     snapshot_path=$(readlink -f "$snapshot_file")
     if [ -f "$snapshot_path" ]; then
-        snapshot_path=$(dirname "$snapshot_path")
+        snapshot_dir=$(dirname "$snapshot_path")
         log debug "snapshot: new: $snapshot_path"
     else
         log critical "snapshot: not found: $snapshot_file"
     fi
 
     snapshot_archive="$(mktemp)"
-    tar -czf "$snapshot_archive" -C "$snapshot_path" --exclude="$INFRACTL_WORKSPACE" .
+    tar -czf "$snapshot_archive" -C "$snapshot_dir" --exclude="$INFRACTL_WORKSPACE" --exclude="$(basename "$snapshot_file")" .
     log debug "snapshot: archive: $snapshot_archive"
 
     snapshot_hash=$(sha1sum "$snapshot_archive" | awk '{print $1}')
@@ -28,7 +32,7 @@ snapshot::new() {
 
     mkdir -p "$(snapshot::path)/resources"
     pushd "$(snapshot::path)/resources" > /dev/null || exit 1
-    yq -s '"resource." + $index + ".yaml"' "$(snapshot::path)/snapshot/$snapshot_file"
+    yq -s '"resource." + $index + ".yaml"' "$snapshot_path"
     popd > /dev/null || exit 1
 
     snapshot::path
