@@ -2,31 +2,26 @@
 # namespace: ansible
 
 ### Settings ##################################################################
-ansible::version() {
+ansible::settings::version() {
     resource::query '.metadata.annotations["ansible.com/version"]'
 }
 
-ansible::roles_path() {
+ansible::settings::roles_path() {
     resource::query '.metadata.annotations["ansible.com/roles_path"]'
 }
 
-ansible::python_version() {
+ansible::settings::python_version() {
     resource::query '.metadata.annotations["python.org/version"]'
 }
 
-ansible::python_requirements() {
+ansible::settings::python_requirements() {
     resource::query '.metadata.annotations["python.org/requirements"]' | yq -r '.[]' | xargs echo
 }
 
 
 ### Inventory #################################################################
 ansible::inventory() {
-    local -r v=$(resource::query '.spec.inventory')
-    if [ -z "$v" ]; then
-        log warn "ansible.com/v1alpha1/inventory: inventory field not found"
-        return
-    fi
-    echo "--inventory $v"
+    echo "--inventory $(resource::query '.spec.inventory')"
 }
 
 ### Playbook ##################################################################
@@ -64,10 +59,10 @@ default_context:
     name: "$(resource::metadata::name)"
     version: "$(resource::version)"
     ansible_inventory: "$(ansible::inventory)"
-    ansible_roles_path: "$(ansible::roles_path)"
-    ansible_version: "$(ansible::version)"
-    python_version: "$(ansible::python_version)"
-    python_requirements: "$(ansible::python_requirements)"
+    ansible_roles_path: "$(ansible::settings::roles_path)"
+    ansible_version: "$(ansible::settings::version)"
+    python_version: "$(ansible::settings::python_version)"
+    python_requirements: "$(ansible::settings::python_requirements)"
 EOF
 }
 
