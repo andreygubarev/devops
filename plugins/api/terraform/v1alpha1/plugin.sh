@@ -85,8 +85,7 @@ api_terraform_v1alpha1__set_terragrunt_version() {
 }
 
 ### Template ##################################################################
-api_terraform_v1alpha1["render_template_config"]=api_terraform_v1alpha1__render_template_config
-api_terraform_v1alpha1__render_template_config() {
+api::template::render_config() {
     cat <<- EOF > "$1"
 default_context:
     name: "$(resource::metadata::name)"
@@ -100,8 +99,7 @@ default_context:
 EOF
 }
 
-api_terraform_v1alpha1["render_template"]=api_terraform_v1alpha1__render_template
-api_terraform_v1alpha1__render_template() {
+api::template::render() {
     local -r template_path="$API_TERRAFORM_V1ALPHA1_PATH/template"
     local -r template_config="$1"
     local -r template_output="$2"

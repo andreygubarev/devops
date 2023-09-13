@@ -58,7 +58,7 @@ ansible::dry_run() {
 }
 
 ### Template ##################################################################
-api::render_template_config() {
+api::template::render_config() {
     cat <<- EOF > "$1"
 default_context:
     name: "$(resource::metadata::name)"
@@ -71,7 +71,7 @@ default_context:
 EOF
 }
 
-api::render_template() {
+api::template::render() {
     local -r template_path="$INFRACTL_PATH/plugins/api/ansible/v1alpha1/template"
     local -r template_config="$1"
     local -r template_output="$2"
