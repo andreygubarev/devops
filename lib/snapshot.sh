@@ -26,5 +26,10 @@ snapshot::new() {
     mkdir -p "$(snapshot::path)/snapshot"
     tar -xzf "$snapshot_archive" -C "$(snapshot::path)/snapshot"
 
+    mkdir -p "$(snapshot::path)/resources"
+    pushd "$(snapshot::path)/resources" > /dev/null || exit 1
+    yq -s '"resource." + $index + ".yaml"' "$(snapshot::path)/snapshot/$snapshot_file"
+    popd > /dev/null || exit 1
+
     snapshot::path
 }
