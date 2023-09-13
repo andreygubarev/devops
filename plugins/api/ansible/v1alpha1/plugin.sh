@@ -3,25 +3,25 @@
 
 ### Settings ##################################################################
 ansible::version() {
-    manifest::query '.metadata.annotations["ansible.com/version"]'
+    resource::query '.metadata.annotations["ansible.com/version"]'
 }
 
 ansible::roles_path() {
-    manifest::query '.metadata.annotations["ansible.com/roles_path"]'
+    resource::query '.metadata.annotations["ansible.com/roles_path"]'
 }
 
 ansible::python_version() {
-    manifest::query '.metadata.annotations["python.org/version"]'
+    resource::query '.metadata.annotations["python.org/version"]'
 }
 
 ansible::python_requirements() {
-    manifest::query '.metadata.annotations["python.org/requirements"]' | yq -r '.[]' | xargs echo
+    resource::query '.metadata.annotations["python.org/requirements"]' | yq -r '.[]' | xargs echo
 }
 
 
 ### Inventory #################################################################
 ansible::inventory() {
-    local -r v=$(manifest::query '.spec.inventory')
+    local -r v=$(resource::query '.spec.inventory')
     if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/inventory: inventory field not found"
         return
@@ -31,7 +31,7 @@ ansible::inventory() {
 
 ### Playbook ##################################################################
 ansible::playbook() {
-    local -r v=$(manifest::query '.spec.playbook')
+    local -r v=$(resource::query '.spec.playbook')
     if [ -z "$v" ]; then
         log error "ansible.com/v1alpha1/playbook: playbook field not found"
         return
@@ -40,7 +40,7 @@ ansible::playbook() {
 }
 
 ansible::extra_vars() {
-    local -r v=$(manifest::query '.spec.extra_vars')
+    local -r v=$(resource::query '.spec.extra_vars')
     if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/extra_vars: extra_vars field not found"
         return
@@ -61,8 +61,8 @@ ansible::dry_run() {
 api::render_template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$(manifest::name)"
-    version: "$(manifest::version)"
+    name: "$(resource::name)"
+    version: "$(resource::version)"
     ansible_inventory: "$(ansible::inventory)"
     ansible_roles_path: "$(ansible::roles_path)"
     ansible_version: "$(ansible::version)"
