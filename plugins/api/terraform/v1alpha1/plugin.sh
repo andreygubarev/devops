@@ -89,7 +89,7 @@ api_terraform_v1alpha1["render_template_config"]=api_terraform_v1alpha1__render_
 api_terraform_v1alpha1__render_template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$(resource::name)"
+    name: "$(resource::metadata::name)"
     version: "$(resource::version)"
     terraform_metadata_labels: "$(api_terraform_v1alpha1__labels)"
     terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend)"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 build::dist() {
-    local -r v="$(resource::dir)/.infractl/dist/$(resource::name)"
+    local -r v="$(resource::dir)/.infractl/dist/$(resource::metadata::name)"
     mkdir -p "$v"
     echo "$v" | sed 's/\/$//'
 }
@@ -15,11 +15,11 @@ build::config() {
 }
 
 build::provider() {
-    resource::kind | cut -d':' -f1
+    resource::metadata::kind | cut -d':' -f1
 }
 
 build::source_path() {
-    resource::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
+    resource::metadata::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
 }
 
 build::source_using_file() {

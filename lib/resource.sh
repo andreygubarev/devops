@@ -11,7 +11,7 @@ resource::new() {
     manifest_path="$v"
     manifest="$(cat "$manifest_path")"
 
-    api::new "$(resource::apiversion)"
+    api::new "$(resource::metadata::apiversion)"
 }
 
 resource::path() {
@@ -24,6 +24,12 @@ resource::dir() {
         log critical "manifest: directory not found: $v"
     fi
     echo "$v"
+}
+
+resource::version() {
+    pushd "$(resource::dir)" > /dev/null || exit 1
+    echo "$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD -- || echo "-dirty")"
+    popd > /dev/null || exit 1
 }
 
 resource::query() {
@@ -41,7 +47,7 @@ resource::query() {
     echo "$v"
 }
 
-resource::apiversion() {
+resource::metadata::apiversion() {
     local -r v=$(resource::query '.apiVersion')
     if [ "$v" == "null" ]; then
         log critical "manifest: '.apiVersion' not found"
@@ -49,7 +55,7 @@ resource::apiversion() {
     echo "$v"
 }
 
-resource::kind() {
+resource::metadata::kind() {
     local -r v=$(resource::query '.kind')
     if [ "$v" == "null" ]; then
         log critical "manifest: '.kind' not found"
@@ -57,15 +63,10 @@ resource::kind() {
     echo "$v"
 }
 
-resource::name() {
+resource::metadata::name() {
     local -r v=$(resource::query '.metadata.name')
     if [ "$v" == "null" ]; then
         log critical "manifest: '.metadata.name' not found"
     fi
 }
 
-resource::version() {
-    pushd "$(resource::dir)" > /dev/null || exit 1
-    echo "$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD -- || echo "-dirty")"
-    popd > /dev/null || exit 1
-}

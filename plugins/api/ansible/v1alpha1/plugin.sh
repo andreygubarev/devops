@@ -61,7 +61,7 @@ ansible::dry_run() {
 api::render_template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$(resource::name)"
+    name: "$(resource::metadata::name)"
     version: "$(resource::version)"
     ansible_inventory: "$(ansible::inventory)"
     ansible_roles_path: "$(ansible::roles_path)"
