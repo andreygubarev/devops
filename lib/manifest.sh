@@ -33,7 +33,7 @@ manifest::query() {
         return
     fi
 
-    local -r v=$(echo "$manifest" | yq "$query" -)
+    local -r v=$(echo "$manifest" | yq "$query")
     if [ "$v" == "null" ]; then
         log warn "manifest: field not found: $query"
         return
