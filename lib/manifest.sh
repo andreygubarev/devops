@@ -11,7 +11,7 @@ manifest::new() {
     manifest_path="$v"
     manifest="$(cat "$manifest_path")"
 
-    new_api "$(manifest::apiversion)"
+    api::new "$(manifest::apiversion)"
 }
 
 manifest::path() {

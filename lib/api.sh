@@ -4,7 +4,7 @@
 INFRACTL_PLUGINS_PATH="$INFRACTL_PATH/plugins"
 
 ### Functions #################################################################
-new_api() {
+api::new() {
     local -r apiversion="$1"
     log info "api: new $apiversion"
 

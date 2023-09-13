@@ -94,7 +94,7 @@ api_ansible_v1alpha1__render_template() {
 
 api_ansible_v1alpha1["run"]=api_ansible_v1alpha1__run
 api_ansible_v1alpha1__run() {
-    build_output=$(build)
+    build_output=$(build::new)
     pushd "$build_output"
     direnv allow .
     eval "$(direnv export bash)"

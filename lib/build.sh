@@ -59,7 +59,7 @@ build_environment() {
     direnv allow "$(build_output)"
 }
 
-build() {
+build::new() {
     api::render_template_config "$(build_config)"
     api::render_template "$(build_config)" "$(build_dist)"
     build_environment

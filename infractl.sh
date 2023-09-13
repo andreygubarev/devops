@@ -43,7 +43,7 @@ command_build() {
         log critical "usage: $0 build -f <manifest>"
     fi
 
-    build
+    build::new
 }
 
 command_run() {
