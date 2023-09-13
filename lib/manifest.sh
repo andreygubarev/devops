@@ -5,9 +5,9 @@ new_manifest() {
     if [ ! -f "$v" ]; then
         log critical "manifest: not found: $1"
     fi
-    manifest_path="$v"
-    log debug "manifest: new $manifest_path"
 
+    log debug "manifest: new $manifest_path"
+    manifest_path="$v"
     manifest="$(cat "$manifest_path")"
 
     new_api "$(manifest_apiversion)"
