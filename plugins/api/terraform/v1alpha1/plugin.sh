@@ -29,8 +29,7 @@ terraform::settings::remote_state_region() {
 }
 
 ### Runtime ###################################################################
-api_terraform_v1alpha1["system_terraform_version"]=api_terraform_v1alpha1__system_terraform_version
-api_terraform_v1alpha1__system_terraform_version() {
+terraform::system_version() {
     if command -v terraform >/dev/null 2>&1; then
         terraform version | head -n1 | cut -d' ' -f2 | cut -d'v' -f2
     else
@@ -38,10 +37,9 @@ api_terraform_v1alpha1__system_terraform_version() {
     fi
 }
 
-api_terraform_v1alpha1["set_terraform_version"]=api_terraform_v1alpha1__set_terraform_version
-api_terraform_v1alpha1__set_terraform_version() {
+terraform::set_version() {
     local -r terraform_version=$(terraform::settings::version)
-    local -r current_terraform_version=$(api_terraform_v1alpha1__system_terraform_version)
+    local -r current_terraform_version=$(terraform::system_version)
 
     if [ "$terraform_version" != "$current_terraform_version" ]; then
         if ! command -v tfenv >/dev/null 2>&1; then
@@ -53,8 +51,7 @@ api_terraform_v1alpha1__set_terraform_version() {
     fi
 }
 
-api_terraform_v1alpha1["system_terragrunt_version"]=api_terraform_v1alpha1__system_terragrunt_version
-api_terraform_v1alpha1__system_terragrunt_version() {
+terraform::system_terragrunt_version() {
     if command -v terragrunt >/dev/null 2>&1; then
         terragrunt --version | awk '{print $3}' | cut -d'v' -f2
     else
@@ -62,10 +59,9 @@ api_terraform_v1alpha1__system_terragrunt_version() {
     fi
 }
 
-api_terraform_v1alpha1["set_terragrunt_version"]=api_terraform_v1alpha1__set_terragrunt_version
-api_terraform_v1alpha1__set_terragrunt_version() {
+terraform::set_terragrunt_version() {
     local -r terragrunt_version=$(terraform::settings::terragrunt_version)
-    local -r current_terragrunt_version=$(api_terraform_v1alpha1__system_terragrunt_version)
+    local -r current_terragrunt_version=$(terraform::system_terragrunt_version)
 
     if [ "$terragrunt_version" != "$current_terragrunt_version" ]; then
         if ! command -v tfenv >/dev/null 2>&1; then
@@ -109,8 +105,8 @@ api::run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    api::set_terraform_version
-    api::set_terragrunt_version
+    terraform::set_version
+    terraform::set_terragrunt_version
 
     if [ "$INFRACTL_DRYRUN" == "true" ]; then
         log info "running: terragrunt plan"
