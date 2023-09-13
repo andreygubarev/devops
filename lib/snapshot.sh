@@ -2,7 +2,7 @@
 # namespace: snapshot
 
 snapshot::path() {
-    echo "$snapshot_path/.infractl/$snapshot_hash"
+    echo "$snapshot_path/$INFRACTL_WORKSPACE/$snapshot_hash"
 }
 
 snapshot::new() {
@@ -16,14 +16,15 @@ snapshot::new() {
     fi
 
     snapshot_archive="$(mktemp)"
-    tar -czf "$snapshot_archive" -C "$snapshot_path" --exclude=".infractl" .
+    tar -czf "$snapshot_archive" -C "$snapshot_path" --exclude="$INFRACTL_WORKSPACE" .
     log debug "snapshot: archive: $snapshot_archive"
 
     snapshot_hash=$(sha1sum "$snapshot_archive" | awk '{print $1}')
     log debug "snapshot: hash: $snapshot_hash"
 
     log debug "snapshot: dir: $(snapshot::path)"
+    mkdir -p "$(snapshot::path)/snapshot"
+    tar -xzf "$snapshot_archive" -C "$(snapshot::path)/snapshot"
 
-    mkdir -p "$(snapshot::path)"
-    tar -xzf "$snapshot_archive" -C "$(snapshot::path)"
+    snapshot::path
 }

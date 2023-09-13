@@ -3,6 +3,7 @@ set -euo pipefail
 
 ### Globals ###################################################################
 INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+INFRACTL_WORKSPACE=".infractl"
 INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 
 ### Libarary ##################################################################
@@ -41,7 +42,7 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        snapshot::new "$opt_f"
+        workspace=$(snapshot::new "$opt_f")
         exit 1
         resource::new "$opt_f"
     else
