@@ -5,29 +5,29 @@ declare -gA api_ansible_v1alpha1
 ### Settings ##################################################################
 api_ansible_v1alpha1["settings_ansible_version"]=api_ansible_v1alpha1__settings_ansible_version
 api_ansible_v1alpha1__settings_ansible_version() {
-    manifest_query '.metadata.annotations["ansible.com/version"]'
+    manifest::query '.metadata.annotations["ansible.com/version"]'
 }
 
 api_ansible_v1alpha1["settings_ansible_roles"]=api_ansible_v1alpha1__settings_ansible_roles
 api_ansible_v1alpha1__settings_ansible_roles() {
-    manifest_query '.metadata.annotations["ansible.com/roles"]'
+    manifest::query '.metadata.annotations["ansible.com/roles"]'
 }
 
 api_ansible_v1alpha1["settings_python_version"]=api_ansible_v1alpha1__settings_python_version
 api_ansible_v1alpha1__settings_python_version() {
-    manifest_query '.metadata.annotations["python.org/version"]'
+    manifest::query '.metadata.annotations["python.org/version"]'
 }
 
 api_ansible_v1alpha1["settings_python_requirements"]=api_ansible_v1alpha1__settings_python_requirements
 api_ansible_v1alpha1__settings_python_requirements() {
-    manifest_query '.metadata.annotations["python.org/requirements"]' | yq -r '.[]' | xargs echo
+    manifest::query '.metadata.annotations["python.org/requirements"]' | yq -r '.[]' | xargs echo
 }
 
 
 ### Inventory #################################################################
 api_ansible_v1alpha1["inventory"]=api_ansible_v1alpha1__inventory
 api_ansible_v1alpha1__inventory() {
-    local -r v=$(manifest_query '.spec.inventory')
+    local -r v=$(manifest::query '.spec.inventory')
     if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/inventory: inventory field not found"
         return
@@ -38,7 +38,7 @@ api_ansible_v1alpha1__inventory() {
 ### Playbook ##################################################################
 api_ansible_v1alpha1["playbook"]=api_ansible_v1alpha1__playbook
 api_ansible_v1alpha1__playbook() {
-    local -r v=$(manifest_query '.spec.playbook')
+    local -r v=$(manifest::query '.spec.playbook')
     if [ -z "$v" ]; then
         log error "ansible.com/v1alpha1/playbook: playbook field not found"
         return
@@ -48,7 +48,7 @@ api_ansible_v1alpha1__playbook() {
 
 api_ansible_v1alpha1["extra_vars"]=api_ansible_v1alpha1__extra_vars
 api_ansible_v1alpha1__extra_vars() {
-    local -r v=$(manifest_query '.spec.extra_vars')
+    local -r v=$(manifest::query '.spec.extra_vars')
     if [ -z "$v" ]; then
         log warn "ansible.com/v1alpha1/extra_vars: extra_vars field not found"
         return
@@ -71,8 +71,8 @@ api_ansible_v1alpha1["render_template_config"]=api_ansible_v1alpha1__render_temp
 api_ansible_v1alpha1__render_template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$(manifest_name)"
-    version: "$(manifest_version)"
+    name: "$(manifest::name)"
+    version: "$(manifest::version)"
     ansible_inventory: "$(api_ansible_v1alpha1__inventory)"
     ansible_roles_path: "$(api_ansible_v1alpha1__settings_ansible_roles)"
     ansible_version: "$(api_ansible_v1alpha1__settings_ansible_version)"

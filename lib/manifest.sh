@@ -6,26 +6,26 @@ manifest::new() {
         log critical "manifest: not found: $1"
     fi
 
-    log debug "manifest: new $manifest_path"
+    log debug "manifest: new $v"
     manifest_path="$v"
     manifest="$(cat "$manifest_path")"
 
-    new_api "$(manifest_apiversion)"
+    new_api "$(manifest::apiversion)"
 }
 
-manifest_path() {
+manifest::path() {
     echo "$manifest_path"
 }
 
-manifest_dir() {
-    local -r v=$(dirname "$(manifest_path)")
+manifest::dir() {
+    local -r v=$(dirname "$(manifest::path)")
     if [ ! -d "$v" ]; then
         log critical "manifest: directory not found: $v"
     fi
     echo "$v"
 }
 
-manifest_query() {
+manifest::query() {
     local -r query="$1"
     if [ -z "$query" ]; then
         log error "manifest: query not found"
@@ -40,31 +40,31 @@ manifest_query() {
     echo "$v"
 }
 
-manifest_apiversion() {
-    local -r v=$(manifest_query '.apiVersion')
+manifest::apiversion() {
+    local -r v=$(manifest::query '.apiVersion')
     if [ "$v" == "null" ]; then
         log critical "manifest: '.apiVersion' not found"
     fi
     echo "$v"
 }
 
-manifest_kind() {
-    local -r v=$(manifest_query '.kind')
+manifest::kind() {
+    local -r v=$(manifest::query '.kind')
     if [ "$v" == "null" ]; then
         log critical "manifest: '.kind' not found"
     fi
     echo "$v"
 }
 
-manifest_name() {
-    local -r v=$(manifest_query '.metadata.name')
+manifest::name() {
+    local -r v=$(manifest::query '.metadata.name')
     if [ "$v" == "null" ]; then
         log critical "manifest: '.metadata.name' not found"
     fi
 }
 
-manifest_version() {
-    pushd "$(manifest_dir)" > /dev/null || exit 1
+manifest::version() {
+    pushd "$(manifest::dir)" > /dev/null || exit 1
     echo "$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD -- || echo "-dirty")"
     popd > /dev/null || exit 1
 }

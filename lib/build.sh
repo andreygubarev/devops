@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 build_dist() {
-    local -r v="$(manifest_dir)/.infractl/dist/$(manifest_name)"
+    local -r v="$(manifest::dir)/.infractl/dist/$(manifest::name)"
     mkdir -p "$v"
     echo "$v"
 }
 
 build_output() {
-    echo "$(build_dist)/$(manifest_version)"
+    echo "$(build_dist)/$(manifest::version)"
 }
 
 build_config() {
@@ -15,11 +15,11 @@ build_config() {
 }
 
 build_provider() {
-    manifest_kind | cut -d':' -f1
+    manifest::kind | cut -d':' -f1
 }
 
 build_source_path() {
-    manifest_kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
+    manifest::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
 }
 
 build_source_using_file() {
@@ -28,7 +28,7 @@ build_source_using_file() {
     local source=$(build_source_path)
 
     if [[ $source != /* ]]; then
-        source="$(manifest_dir)/$source"
+        source="$(manifest::dir)/$source"
     fi
 
     if [ -d "$source" ]; then
@@ -40,7 +40,7 @@ build_source_using_file() {
 }
 
 build_source() {
-    cp "$(manifest_path)" "$(build_output)/manifest.yaml"
+    cp "$(manifest::path)" "$(build_output)/manifest.yaml"
 
     case "$(build_provider)" in
         "file")
@@ -53,8 +53,8 @@ build_source() {
 }
 
 build_environment() {
-    if [ -f "$(manifest_dir)/.envrc" ]; then
-        cat "$(manifest_dir)/.envrc" >> "$(build_output)/.envrc"
+    if [ -f "$(manifest::dir)/.envrc" ]; then
+        cat "$(manifest::dir)/.envrc" >> "$(build_output)/.envrc"
     fi
     direnv allow "$(build_output)"
 }

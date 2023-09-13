@@ -5,33 +5,33 @@ declare -gA api_terraform_v1alpha1
 ### Settings ##################################################################
 api_terraform_v1alpha1["settings_terraform_version"]=api_terraform_v1alpha1__settings_terraform_version
 api_terraform_v1alpha1__settings_terraform_version() {
-    manifest_query '.metadata.annotations["terraform.io/version"]'
+    manifest::query '.metadata.annotations["terraform.io/version"]'
 }
 
 api_terraform_v1alpha1["settings_terragrunt_version"]=api_terraform_v1alpha1__settings_terragrunt_version
 api_terraform_v1alpha1__settings_terragrunt_version() {
-    manifest_query '.metadata.annotations["terragrunt.gruntwork.io/version"]'
+    manifest::query '.metadata.annotations["terragrunt.gruntwork.io/version"]'
 }
 
 api_terraform_v1alpha1["labels"]=api_terraform_v1alpha1__labels
 api_terraform_v1alpha1__labels() {
-    local -r v=$(manifest_query '.metadata.labels | keys | .[]')
+    local -r v=$(manifest::query '.metadata.labels | keys | .[]')
     echo "$v" | xargs echo
 }
 
 api_terraform_v1alpha1["settings_remote_state_backend"]=api_terraform_v1alpha1__settings_remote_state_backend
 api_terraform_v1alpha1__settings_remote_state_backend() {
-    manifest_query '.metadata.annotations["terraform.io/remote-state-backend"]'
+    manifest::query '.metadata.annotations["terraform.io/remote-state-backend"]'
 }
 
 api_terraform_v1alpha1["settings_remote_state_locking"]=api_terraform_v1alpha1__settings_remote_state_locking
 api_terraform_v1alpha1__settings_remote_state_locking() {
-    manifest_query '.metadata.annotations["terraform.io/remote-state-locking"]'
+    manifest::query '.metadata.annotations["terraform.io/remote-state-locking"]'
 }
 
 api_terraform_v1alpha1["settings_remote_state_region"]=api_terraform_v1alpha1__settings_remote_state_region
 api_terraform_v1alpha1__settings_remote_state_region() {
-    manifest_query '.metadata.annotations["terraform.io/remote-state-region"]'
+    manifest::query '.metadata.annotations["terraform.io/remote-state-region"]'
 }
 
 ### Runtime ###################################################################
@@ -89,8 +89,8 @@ api_terraform_v1alpha1["render_template_config"]=api_terraform_v1alpha1__render_
 api_terraform_v1alpha1__render_template_config() {
     cat <<- EOF > "$1"
 default_context:
-    name: "$(manifest_name)"
-    version: "$(manifest_version)"
+    name: "$(manifest::name)"
+    version: "$(manifest::version)"
     terraform_metadata_labels: "$(api_terraform_v1alpha1__labels)"
     terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend)"
     terraform_remote_state_locking: "$(api_terraform_v1alpha1__settings_remote_state_locking)"
