@@ -5,14 +5,16 @@ new_manifest() {
     if [ ! -f "$v" ]; then
         log critical "manifest: not found: $1"
     fi
-    manifest="$v"
-    log debug "manifest: new $manifest"
+    manifest_path="$v"
+    log debug "manifest: new $manifest_path"
+
+    manifest="$(cat "$manifest_path")"
 
     new_api "$(manifest_apiversion)"
 }
 
 manifest_path() {
-    echo "$manifest"
+    echo "$manifest_path"
 }
 
 manifest_dir() {
@@ -30,7 +32,7 @@ manifest_query() {
         return
     fi
 
-    local -r v=$(yq "$query" < "$(manifest_path)")
+    local -r v=$(echo "$manifest" | yq "$query" -)
     if [ "$v" == "null" ]; then
         log warn "manifest: field not found: $query"
         return
