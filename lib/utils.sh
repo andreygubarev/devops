@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 # namespace: utils
 
+utils::resources() {
+    local -r manifest=$(readlink -f "$1")
+    if [ ! -f "$manifest" ]; then
+        log critical "manifest: not found: $1"
+    fi
+
+    temp_dir=$(mktemp -d)
+    # trap 'rm -rf "$temp_dir"' EXIT
+
+    pushd "$temp_dir" > /dev/null || exit 1
+    yq -s '"resource_" + $index' "$manifest"
+    popd > /dev/null || exit 1
+
+    local -r resources=$(find "$temp_dir" -type f | sort)
+    echo "$resources"
+}
+
 utils::clone() {
     local func="$1"
     local name="$2"

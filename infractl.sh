@@ -38,7 +38,10 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        resource::new "$opt_f"
+        for f in $(utils::resources "$opt_f"); do
+            resource::new "$opt_f" "$(cat "$f")"
+        done
+
     else
         log critical "usage: $0 build -f <manifest>"
     fi
