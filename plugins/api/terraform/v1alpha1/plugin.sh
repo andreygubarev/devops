@@ -109,8 +109,7 @@ api::template::render() {
 
 ### Runtime ###################################################################
 
-api_terraform_v1alpha1["run"]=api_terraform_v1alpha1__run
-api_terraform_v1alpha1__run() {
+api::run() {
     build_output=$(build::new)
     pushd "$build_output"
     direnv allow .
