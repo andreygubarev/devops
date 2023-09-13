@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
-build_dist() {
+build::dist() {
     local -r v="$(manifest::dir)/.infractl/dist/$(manifest::name)"
     mkdir -p "$v"
     echo "$v"
 }
 
-build_output() {
-    echo "$(build_dist)/$(manifest::version)"
+build::output() {
+    echo "$(build::dist)/$(manifest::version)"
 }
 
-build_config() {
-    echo "$(build_output).config.yaml"
+build::config() {
+    echo "$(build::output).config.yaml"
 }
 
-build_provider() {
+build::provider() {
     manifest::kind | cut -d':' -f1
 }
 
-build_source_path() {
+build::source_path() {
     manifest::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
 }
 
-build_source_using_file() {
-    log info "copying source: $(build_source_path)"
+build::source_using_file() {
+    log info "copying source: $(build::source_path)"
 
-    local source=$(build_source_path)
+    local source=$(build::source_path)
 
     if [[ $source != /* ]]; then
         source="$(manifest::dir)/$source"
@@ -35,35 +35,35 @@ build_source_using_file() {
         source="${source%/}/"
     fi
 
-    rm -rf "$(build_output)/src"
-    cp -r "$source" "$(build_output)/src/"
+    rm -rf "$(build::output)/src"
+    cp -r "$source" "$(build::output)/src/"
 }
 
-build_source() {
-    cp "$(manifest::path)" "$(build_output)/manifest.yaml"
+build::source() {
+    cp "$(manifest::path)" "$(build::output)/manifest.yaml"
 
-    case "$(build_provider)" in
+    case "$(build::provider)" in
         "file")
-            build_source_using_file
+            build::source_using_file
             ;;
         *)
-            log critical "Unsupported build provider: $(build_provider)"
+            log critical "Unsupported build provider: $(build::provider)"
             ;;
     esac
 }
 
-build_environment() {
+build::environment() {
     if [ -f "$(manifest::dir)/.envrc" ]; then
-        cat "$(manifest::dir)/.envrc" >> "$(build_output)/.envrc"
+        cat "$(manifest::dir)/.envrc" >> "$(build::output)/.envrc"
     fi
-    direnv allow "$(build_output)"
+    direnv allow "$(build::output)"
 }
 
 build::new() {
-    api::render_template_config "$(build_config)"
-    api::render_template "$(build_config)" "$(build_dist)"
-    build_environment
-    build_source
+    api::render_template_config "$(build::config)"
+    api::render_template "$(build::config)" "$(build::dist)"
+    build::environment
+    build::source
 
-    build_output
+    build::output
 }
