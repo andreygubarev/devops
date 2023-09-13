@@ -9,11 +9,7 @@ resource::new() {
 
     log debug "resource: new $v"
     manifest_path="$v"
-
-    manifest="$2"
-    if [ -z "$manifest" ]; then
-        log critical "resource: empty manifest: $v"
-    fi
+    manifest="$(cat "$manifest_path")"
 
     api::new "$(resource::metadata::apiversion)"
 }
