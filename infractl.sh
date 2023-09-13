@@ -13,6 +13,9 @@ source "$INFRACTL_PATH/lib/utils.sh"
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
 
+# shellcheck source=lib/snapshot.sh
+source "$INFRACTL_PATH/lib/snapshot.sh"
+
 # shellcheck source=lib/resource.sh
 source "$INFRACTL_PATH/lib/resource.sh"
 
@@ -38,6 +41,8 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
+        snapshot::new "$opt_f"
+        exit 1
         resource::new "$opt_f"
     else
         log critical "usage: $0 build -f <manifest>"
