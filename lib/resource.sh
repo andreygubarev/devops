@@ -70,7 +70,7 @@ resource::metadata::name() {
     fi
 }
 
-resource::source::provider() {
+resource::source::scheme() {
     resource::metadata::kind | cut -d':' -f1
 }
 

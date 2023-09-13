@@ -14,18 +14,10 @@ build::path::config() {
     echo "$(build::path::output).config.yaml"
 }
 
-build::source::provider() {
-    resource::metadata::kind | cut -d':' -f1
-}
-
-build::source::path() {
-    resource::metadata::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
-}
-
 build::source_using_file() {
-    log info "copying source: $(build::source::path)"
+    log info "copying source: $(resource::source::path)"
 
-    local source=$(build::source::path)
+    local source=$(resource::source::path)
 
     if [[ $source != /* ]]; then
         source="$(resource::dir)/$source"
@@ -42,12 +34,12 @@ build::source_using_file() {
 build::push_source() {
     cp "$(resource::path)" "$(build::path::output)/manifest.yaml"
 
-    case "$(build::source::provider)" in
+    case "$(resource::source::scheme)" in
         "file")
             build::source_using_file
             ;;
         *)
-            log critical "Unsupported build provider: $(build::source::provider)"
+            log critical "Unsupported build provider: $(resource::source::scheme)"
             ;;
     esac
 }
