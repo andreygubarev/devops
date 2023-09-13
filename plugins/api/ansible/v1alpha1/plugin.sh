@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-API_ANSIBLE_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/ansible/v1alpha1"
-declare -gA api_ansible_v1alpha1
+# namespace: ansible
 
 ### Settings ##################################################################
 ansible::version() {
@@ -73,7 +72,7 @@ EOF
 }
 
 api::render_template() {
-    local -r template_path="$API_ANSIBLE_V1ALPHA1_PATH/template"
+    local -r template_path="$INFRACTL_PATH/plugins/api/ansible/v1alpha1/template"
     local -r template_config="$1"
     local -r template_output="$2"
 
