@@ -3,7 +3,7 @@
 build::dist() {
     local -r v="$(manifest::dir)/.infractl/dist/$(manifest::name)"
     mkdir -p "$v"
-    echo "$v"
+    echo "$v" | sed 's/\/$//'
 }
 
 build::output() {
