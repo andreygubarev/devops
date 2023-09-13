@@ -98,7 +98,7 @@ command_clean() {
         log critical "usage: $0 clean -f <manifest>"
     fi
 
-    rm -rf "$(build::dist)"
+    rm -rf "$(build::path::dist)"
 }
 
 command_install() {

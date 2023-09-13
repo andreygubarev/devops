@@ -86,6 +86,6 @@ api::run() {
     direnv allow .
     eval "$(direnv export bash)"
 
-    echo "ansible-playbook $(ansible::inventory) $(ansible::dry_run) $(ansible::extra_vars "$(build::output)") src/$(ansible::playbook)"
+    echo "ansible-playbook $(ansible::inventory) $(ansible::dry_run) $(ansible::extra_vars "$(build::path::output)") src/$(ansible::playbook)"
     popd
 }

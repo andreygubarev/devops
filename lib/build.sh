@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
-build::dist() {
+build::path::dist() {
     local -r v="$(resource::dir)/.infractl/dist/$(resource::metadata::name)"
     mkdir -p "$v"
     echo "$v" | sed 's/\/$//'
 }
 
-build::output() {
-    echo "$(build::dist)/$(resource::version)"
+build::path::output() {
+    echo "$(build::path::dist)/$(resource::version)"
 }
 
-build::config() {
-    echo "$(build::output).config.yaml"
+build::path::config() {
+    echo "$(build::path::output).config.yaml"
 }
 
-build::provider() {
+build::source::provider() {
     resource::metadata::kind | cut -d':' -f1
 }
 
-build::source_path() {
+build::source::path() {
     resource::metadata::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
 }
 
 build::source_using_file() {
-    log info "copying source: $(build::source_path)"
+    log info "copying source: $(build::source::path)"
 
-    local source=$(build::source_path)
+    local source=$(build::source::path)
 
     if [[ $source != /* ]]; then
         source="$(resource::dir)/$source"
@@ -35,35 +35,35 @@ build::source_using_file() {
         source="${source%/}/"
     fi
 
-    rm -rf "$(build::output)/src"
-    cp -r "$source" "$(build::output)/src/"
+    rm -rf "$(build::path::output)/src"
+    cp -r "$source" "$(build::path::output)/src/"
 }
 
-build::source() {
-    cp "$(resource::path)" "$(build::output)/manifest.yaml"
+build::push_source() {
+    cp "$(resource::path)" "$(build::path::output)/manifest.yaml"
 
-    case "$(build::provider)" in
+    case "$(build::source::provider)" in
         "file")
             build::source_using_file
             ;;
         *)
-            log critical "Unsupported build provider: $(build::provider)"
+            log critical "Unsupported build provider: $(build::source::provider)"
             ;;
     esac
 }
 
-build::environment() {
+build::push_environment() {
     if [ -f "$(resource::dir)/.envrc" ]; then
-        cat "$(resource::dir)/.envrc" >> "$(build::output)/.envrc"
+        cat "$(resource::dir)/.envrc" >> "$(build::path::output)/.envrc"
     fi
-    direnv allow "$(build::output)"
+    direnv allow "$(build::path::output)"
 }
 
 build::new() {
-    api::template::render_config "$(build::config)"
-    api::template::render "$(build::config)" "$(build::dist)"
-    build::environment
-    build::source
+    api::template::render_config "$(build::path::config)"
+    api::template::render "$(build::path::config)" "$(build::path::dist)"
+    build::push_environment
+    build::push_source
 
-    build::output
+    build::path::output
 }
