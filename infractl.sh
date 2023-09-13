@@ -38,7 +38,7 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        new_manifest "$opt_f"
+        manifest::new "$opt_f"
     else
         log critical "usage: $0 build -f <manifest>"
     fi
@@ -65,7 +65,7 @@ command_run() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        new_manifest "$opt_f"
+        manifest::new "$opt_f"
     else
         log critical "usage: $0 run [-n] -f <manifest>"
     fi
@@ -93,7 +93,7 @@ command_clean() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        new_manifest "$opt_f"
+        manifest::new "$opt_f"
     else
         log critical "usage: $0 clean -f <manifest>"
     fi

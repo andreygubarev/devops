@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-new_manifest() {
+manifest::new() {
     local -r v=$(readlink -f "$1")
     if [ ! -f "$v" ]; then
         log critical "manifest: not found: $1"
