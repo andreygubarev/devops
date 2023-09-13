@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-API_TERRAFORM_V1ALPHA1_PATH="$INFRACTL_PATH/plugins/api/terraform/v1alpha1"
-declare -gA api_terraform_v1alpha1
-
 ### Settings ##################################################################
 terraform::settings::version() {
     resource::query '.metadata.annotations["terraform.io/version"]'
@@ -90,7 +87,7 @@ EOF
 }
 
 api::template::render() {
-    local -r template_path="$API_TERRAFORM_V1ALPHA1_PATH/template"
+    local -r template_path="$INFRACTL_PATH/plugins/api/terraform/v1alpha1/template"
     local -r template_config="$1"
     local -r template_output="$2"
 
