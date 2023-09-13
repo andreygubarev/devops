@@ -11,24 +11,20 @@ terraform::settings::terragrunt_version() {
     resource::query '.metadata.annotations["terragrunt.gruntwork.io/version"]'
 }
 
-api_terraform_v1alpha1["labels"]=api_terraform_v1alpha1__labels
-api_terraform_v1alpha1__labels() {
+terraform::settings::labels() {
     local -r v=$(resource::query '.metadata.labels | keys | .[]')
     echo "$v" | xargs echo
 }
 
-api_terraform_v1alpha1["settings_remote_state_backend"]=api_terraform_v1alpha1__settings_remote_state_backend
-api_terraform_v1alpha1__settings_remote_state_backend() {
+terraform::settings::remote_state_backend() {
     resource::query '.metadata.annotations["terraform.io/remote-state-backend"]'
 }
 
-api_terraform_v1alpha1["settings_remote_state_locking"]=api_terraform_v1alpha1__settings_remote_state_locking
-api_terraform_v1alpha1__settings_remote_state_locking() {
+terraform::settings::remote_state_locking() {
     resource::query '.metadata.annotations["terraform.io/remote-state-locking"]'
 }
 
-api_terraform_v1alpha1["settings_remote_state_region"]=api_terraform_v1alpha1__settings_remote_state_region
-api_terraform_v1alpha1__settings_remote_state_region() {
+terraform::settings::remote_state_region() {
     resource::query '.metadata.annotations["terraform.io/remote-state-region"]'
 }
 
@@ -88,10 +84,10 @@ api::template::render_config() {
 default_context:
     name: "$(resource::metadata::name)"
     version: "$(resource::version)"
-    terraform_metadata_labels: "$(api_terraform_v1alpha1__labels)"
-    terraform_remote_state_backend: "$(api_terraform_v1alpha1__settings_remote_state_backend)"
-    terraform_remote_state_locking: "$(api_terraform_v1alpha1__settings_remote_state_locking)"
-    terraform_remote_state_region: "$(api_terraform_v1alpha1__settings_remote_state_region)"
+    terraform_metadata_labels: "$(terraform::settings::labels)"
+    terraform_remote_state_backend: "$(terraform::settings::remote_state_backend)"
+    terraform_remote_state_locking: "$(terraform::settings::remote_state_locking)"
+    terraform_remote_state_region: "$(terraform::settings::remote_state_region)"
     terraform_version: "$(terraform::settings::version)"
     terragrunt_version: "$(terraform::settings::terragrunt_version)"
 EOF
