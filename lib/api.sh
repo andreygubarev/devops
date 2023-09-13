@@ -12,12 +12,6 @@ api::new() {
         "ansible.com/v1alpha1")
             # shellcheck source=../plugins/api/ansible/v1alpha1/plugin.sh
             source "$INFRACTL_PLUGINS_PATH/api/ansible/v1alpha1/plugin.sh"
-
-            # shellcheck disable=SC2154
-            for key in "${!api_ansible_v1alpha1[@]}"; do
-                utils::clone "${api_ansible_v1alpha1[$key]}" "api::$key"
-                log debug "api::$key -> ${api_ansible_v1alpha1[$key]}"
-            done
             ;;
         "terraform.io/v1alpha1")
             # shellcheck source=../plugins/api/terraform/v1alpha1/plugin.sh
