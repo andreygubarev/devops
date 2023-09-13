@@ -21,7 +21,12 @@ ansible::settings::python_requirements() {
 
 ### Inventory #################################################################
 ansible::inventory() {
-    echo "--inventory $(resource::query '.spec.inventory')"
+    local -r v=$(resource::query '.spec.inventory')
+    if [ -z "$v" ]; then
+        log warn "ansible.com/v1alpha1/inventory: inventory field not found"
+        return
+    fi
+    echo "--inventory $v"
 }
 
 ### Playbook ##################################################################
