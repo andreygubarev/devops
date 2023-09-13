@@ -70,3 +70,10 @@ resource::metadata::name() {
     fi
 }
 
+resource::source::provider() {
+    resource::metadata::kind | cut -d':' -f1
+}
+
+resource::source::path() {
+    resource::metadata::kind | cut -d':' -f2 | cut -d'/' -f2- | cut -d'/' -f2-
+}
