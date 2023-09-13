@@ -31,7 +31,7 @@ build::source_using_file() {
     cp -r "$source" "$(build::path::output)/src/"
 }
 
-build::push_source() {
+build::copy::source() {
     cp "$(resource::path)" "$(build::path::output)/manifest.yaml"
 
     case "$(resource::source::scheme)" in
@@ -44,7 +44,7 @@ build::push_source() {
     esac
 }
 
-build::push_environment() {
+build::copy::environment() {
     if [ -f "$(resource::dir)/.envrc" ]; then
         cat "$(resource::dir)/.envrc" >> "$(build::path::output)/.envrc"
     fi
@@ -54,8 +54,8 @@ build::push_environment() {
 build::new() {
     api::template::render_config "$(build::path::config)"
     api::template::render "$(build::path::config)" "$(build::path::dist)"
-    build::push_environment
-    build::push_source
+    build::copy::environment
+    build::copy::source
 
     build::path::output
 }
