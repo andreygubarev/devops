@@ -14,7 +14,7 @@ build::path::config() {
     echo "$(build::path::output).config.yaml"
 }
 
-build::source_using_file() {
+build::copy::file() {
     log info "copying source: $(resource::source::path)"
 
     local source=$(resource::source::path)
@@ -36,7 +36,7 @@ build::copy::source() {
 
     case "$(resource::source::scheme)" in
         "file")
-            build::source_using_file
+            build::copy::file
             ;;
         *)
             log critical "Unsupported build provider: $(resource::source::scheme)"
