@@ -45,6 +45,7 @@ command_build() {
     if [ -n "${opt_f:-}" ]; then
         workspace::new "$opt_f"
         resource::new $(workspace::document::index 1)
+        api::new "$(resource::metadata::apiversion)"
         build::new
         exit 1
     else

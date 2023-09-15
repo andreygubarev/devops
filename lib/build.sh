@@ -5,7 +5,7 @@ build::path::dir() {
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
-    log trace "build: dir: $v"
+    log debug "build: dir: $v"
     echo "$v"
 }
 
@@ -26,8 +26,8 @@ build::copy::file() {
         src="${src%/}/"
     fi
 
-    rm -rf "$(build::path::dir)"
-    cp -r "$src" "$(build::path::dir)"
+    rm -rf "$(build::path::dir)/src"
+    cp -r "$src" "$(build::path::dir)/src"
 }
 
 build::copy::source() {
@@ -50,7 +50,7 @@ build::copy::environment() {
 
 build::new() {
     api::template::render_config "$(build::path::config)"
-    api::template::render "$(build::path::config)" "$(build::path::dir)"
+    api::template::render "$(build::path::config)" "$(workspace::dir)/build/"
     build::copy::environment
     build::copy::source
 

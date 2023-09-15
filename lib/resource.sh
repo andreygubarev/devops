@@ -9,8 +9,6 @@ resource::new() {
 
     log debug "resource: new $v"
     resource="$(cat "$v")"
-
-    api::new "$(resource::metadata::apiversion)"
 }
 
 resource::query() {
@@ -49,6 +47,7 @@ resource::metadata::name() {
     if [ "$v" == "null" ]; then
         log critical "resource: '.metadata.name' not found"
     fi
+    echo "$v"
 }
 
 resource::source::scheme() {
