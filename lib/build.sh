@@ -10,7 +10,7 @@ build::path::dir() {
 }
 
 build::path::config() {
-    echo "$(build::path::dir)/config.yaml"
+    echo "$(build::path::dir).config.yaml"
 }
 
 build::copy::file() {
