@@ -4,6 +4,7 @@ set -euo pipefail
 ### Globals ###################################################################
 INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
 INFRACTL_WORKSPACE=".infractl"
+
 INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 
 ### Libarary ##################################################################
@@ -13,6 +14,9 @@ source "$INFRACTL_PATH/lib/utils.sh"
 
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
+
+# shellcheck source=lib/workspace.sh
+source "$INFRACTL_PATH/lib/workspace.sh"
 
 # shellcheck source=lib/snapshot.sh
 source "$INFRACTL_PATH/lib/snapshot.sh"
@@ -42,7 +46,8 @@ command_build() {
     done
 
     if [ -n "${opt_f:-}" ]; then
-        workspace=$(snapshot::new "$opt_f")
+        workspace::new "$opt_f"
+        workspace::path
         exit 1
         resource::new "$opt_f"
     else
