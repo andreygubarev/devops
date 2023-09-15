@@ -7,7 +7,7 @@ build::path::dist() {
 }
 
 build::path::output() {
-    echo "$(build::path::dist)/$(resource::version)"
+    echo "$(build::path::dist)"
 }
 
 build::path::config() {

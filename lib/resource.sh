@@ -19,10 +19,11 @@ resource::path() {
 }
 
 resource::dir() {
-    local -r v=$(dirname "$(resource::path)")
+    local -r v="$(workspace::dir)/workspace/$(resource::metadata::name)"
     if [ ! -d "$v" ]; then
-        log critical "resource: directory not found: $v"
+        mkdir -p "$v"
     fi
+    log debug "resource: resource dir: $v"
     echo "$v"
 }
 
