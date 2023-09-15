@@ -27,7 +27,7 @@ workspace::dir() {
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
-    log debug "workspace: dir: $v"
+    log trace "workspace: dir: $v"
     echo "$v"
 }
 
@@ -36,7 +36,7 @@ workspace::snapshot::dir() {
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
-    log debug "workspace: snapshot dir: $v"
+    log trace "workspace: snapshot dir: $v"
     echo "$v"
 }
 
@@ -60,12 +60,16 @@ workspace::manifest::path() {
     echo "$(workspace::snapshot::dir)/$manifest_file"
 }
 
+workspace::manifest::version() {
+    echo "$manifest_version"
+}
+
 workspace::document::dir() {
     local -r v="$(workspace::dir)/document"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
-    log debug "workspace: document dir: $v"
+    log trace "workspace: document dir: $v"
     echo "$v"
 }
 

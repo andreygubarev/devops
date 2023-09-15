@@ -76,7 +76,7 @@ api::template::render_config() {
     cat <<- EOF > "$1"
 default_context:
     name: "$(resource::metadata::name)"
-    version: "$(resource::version)"
+    version: "$(workspace::manifest::version)"
     terraform_metadata_labels: "$(terraform::settings::labels)"
     terraform_remote_state_backend: "$(terraform::settings::remote_state_backend)"
     terraform_remote_state_locking: "$(terraform::settings::remote_state_locking)"

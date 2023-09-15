@@ -44,9 +44,9 @@ command_build() {
 
     if [ -n "${opt_f:-}" ]; then
         workspace::new "$opt_f"
-        workspace::document::index 1
+        resource::new $(workspace::document::index 1)
+        build::new
         exit 1
-        resource::new "$opt_f"
     else
         log critical "usage: $0 build -f <manifest>"
     fi
