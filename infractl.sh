@@ -42,17 +42,16 @@ command_build() {
     esac
     done
 
-    if [ -n "${opt_f:-}" ]; then
-        workspace::new "$opt_f"
-        resource::new $(workspace::document::index 1)
-        api::new "$(resource::metadata::apiversion)"
-        build::new
-        exit 1
-    else
+    if [ ! -n "${opt_f:-}" ]; then
         log critical "usage: $0 build -f <manifest>"
     fi
 
-    build::new
+    workspace::new "$opt_f"
+    for doc in $(workspace::documents); do
+        resource::new "$doc"
+        api::new "$(resource::metadata::apiversion)"
+        build::new
+    done
 }
 
 command_run() {

@@ -20,7 +20,7 @@ workspace::new() {
 
     rm -rf "${manifest_dir:?}/$INFRACTL_WORKSPACE/$manifest_version"
     workspace::snapshot::new
-    workspace::document::new
+    workspace::documents::new
 }
 
 workspace::dir() {
@@ -65,32 +65,23 @@ workspace::manifest::version() {
     echo "$manifest_version"
 }
 
-workspace::document::dir() {
+workspace::documents::dir() {
     local -r v="$(workspace::dir)/documents"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
-    log trace "workspace: document dir: $v"
+    log trace "workspace: documents dir: $v"
     echo "$v"
 }
 
-workspace::document::new() {
-    yq --prettyPrint --no-colors "$(workspace::manifest::path)" > "$(workspace::document::dir)/document.yml"
-    pushd "$(workspace::document::dir)" > /dev/null || exit 1
+workspace::documents::new() {
+    yq --prettyPrint --no-colors "$(workspace::manifest::path)" > "$(workspace::documents::dir)/documents.yml"
+    pushd "$(workspace::documents::dir)" > /dev/null || exit 1
     # shellcheck disable=SC2016
-    yq -s '"document.part" + $index + ".yml"' document.yml
+    yq -s '"documents.part" + $index + ".yml"' documents.yml
     popd > /dev/null || exit 1
 }
 
-workspace::document::length() {
-    local -r v=$(ls "$(workspace::document::dir)"/document.part*.yml)
-    echo "$v"
-}
-
-workspace::document::index() {
-    local -r v="document.part$1.yml"
-    if [ ! -f "$(workspace::document::dir)/$v" ]; then
-        log critical "workspace: document not found: $v"
-    fi
-    echo "$(workspace::document::dir)/$v"
+workspace::documents() {
+    ls "$(workspace::documents::dir)"/documents.part*.yml
 }
