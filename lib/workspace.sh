@@ -76,3 +76,16 @@ workspace::document::new() {
     yq -s '"document.part" + $index + ".yml"' document.yml
     popd > /dev/null || exit 1
 }
+
+workspace::document::length() {
+    local -r v=$(ls "$(workspace::document::dir)"/document.part*.yml)
+    echo "$v"
+}
+
+workspace::document::index() {
+    local -r v="document.part$1.yml"
+    if [ ! -f "$(workspace::document::dir)/$v" ]; then
+        log critical "workspace: document not found: $v"
+    fi
+    echo "$(workspace::document::dir)/$v"
+}

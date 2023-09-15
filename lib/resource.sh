@@ -8,14 +8,14 @@ resource::new() {
     fi
 
     log debug "resource: new $v"
-    manifest_path="$v"
-    manifest="$(cat "$manifest_path")"
+    resource_path="$v"
+    resource="$(cat "$resource_path")"
 
     api::new "$(resource::metadata::apiversion)"
 }
 
 resource::path() {
-    echo "$manifest_path"
+    echo "$resource_path"
 }
 
 resource::dir() {
@@ -39,7 +39,7 @@ resource::query() {
         return
     fi
 
-    local -r v=$(echo "$manifest" | yq "$query")
+    local -r v=$(echo "$resource" | yq "$query")
     if [ "$v" == "null" ]; then
         log warn "resource: field not found: $query"
         return
