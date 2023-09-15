@@ -9,6 +9,11 @@ resource::new() {
 
     log debug "resource: new $v"
     resource="$(cat "$v")"
+    resource_path="$v"
+}
+
+resource::path() {
+    echo "$resource_path"
 }
 
 resource::query() {

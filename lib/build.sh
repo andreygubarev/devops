@@ -16,16 +16,15 @@ build::path::config() {
 build::copy::file() {
     log debug "build: source: $(resource::source::path)"
 
-    local src=$(resource::source::path)
+    cp "$(resource::path)" "$(build::path::dir)/resource.yml"
 
+    local src=$(resource::source::path)
     if [[ $src != /* ]]; then
         src="$(workspace::snapshot::dir)/$src"
     fi
-
     if [ -d "$src" ]; then
         src="${src%/}/"
     fi
-
     rm -rf "$(build::path::dir)/src"
     cp -r "$src" "$(build::path::dir)/src"
 }
