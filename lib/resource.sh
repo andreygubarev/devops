@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# namespace: manifest
+# namespace: resource
 
 resource::new() {
     local -r v=$(readlink -f "$1")
@@ -8,28 +8,12 @@ resource::new() {
     fi
 
     log debug "resource: new $v"
-    manifest_path="$v"
-    manifest="$(cat "$manifest_path")"
-
-    api::new "$(resource::metadata::apiversion)"
+    resource="$(cat "$v")"
+    resource_path="$v"
 }
 
 resource::path() {
-    echo "$manifest_path"
-}
-
-resource::dir() {
-    local -r v=$(dirname "$(resource::path)")
-    if [ ! -d "$v" ]; then
-        log critical "resource: directory not found: $v"
-    fi
-    echo "$v"
-}
-
-resource::version() {
-    pushd "$(resource::dir)" > /dev/null || exit 1
-    echo "$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD -- || echo "-dirty")"
-    popd > /dev/null || exit 1
+    echo "$resource_path"
 }
 
 resource::query() {
@@ -39,7 +23,7 @@ resource::query() {
         return
     fi
 
-    local -r v=$(echo "$manifest" | yq "$query")
+    local -r v=$(echo "$resource" | yq "$query")
     if [ "$v" == "null" ]; then
         log warn "resource: field not found: $query"
         return
@@ -68,6 +52,7 @@ resource::metadata::name() {
     if [ "$v" == "null" ]; then
         log critical "resource: '.metadata.name' not found"
     fi
+    echo "$v"
 }
 
 resource::source::scheme() {

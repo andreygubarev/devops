@@ -1,6 +1,6 @@
 ### Params ###################################################################
 locals {
-  manifest = yamldecode(file("${get_terragrunt_dir()}/manifest.yaml"))
+  resource = yamldecode(file("${get_terragrunt_dir()}/resource.yml"))
 }
 
 ### Terraform #################################################################
@@ -9,8 +9,8 @@ terraform {
 }
 
 ### Inputs ####################################################################
-inputs = merge(local.manifest.spec, {
-  metadata = local.manifest.metadata
+inputs = merge(local.resource.spec, {
+  metadata = local.resource.metadata
 })
 
 generate "inputs" {

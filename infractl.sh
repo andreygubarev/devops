@@ -3,6 +3,8 @@ set -euo pipefail
 
 ### Globals ###################################################################
 INFRACTL_PATH="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+INFRACTL_WORKSPACE=".infractl"
+
 INFRACTL_DRYRUN="${INFRACTL_DRYRUN:-false}"
 
 ### Libarary ##################################################################
@@ -12,6 +14,9 @@ source "$INFRACTL_PATH/lib/utils.sh"
 
 # shellcheck source=lib/logging.sh
 source "$INFRACTL_PATH/lib/logging.sh"
+
+# shellcheck source=lib/workspace.sh
+source "$INFRACTL_PATH/lib/workspace.sh"
 
 # shellcheck source=lib/resource.sh
 source "$INFRACTL_PATH/lib/resource.sh"
@@ -37,13 +42,15 @@ command_build() {
     esac
     done
 
-    if [ -n "${opt_f:-}" ]; then
-        resource::new "$opt_f"
-    else
+    if [ -z "${opt_f:-}" ]; then
         log critical "usage: $0 build -f <manifest>"
     fi
 
-    build::new
+    workspace::new "$opt_f"
+    for doc in $(workspace::documents); do
+        workspace::set "$doc"
+        build::new
+    done
 }
 
 command_run() {
@@ -64,17 +71,20 @@ command_run() {
         esac
     done
 
-    if [ -n "${opt_f:-}" ]; then
-        resource::new "$opt_f"
-    else
-        log critical "usage: $0 run [-n] -f <manifest>"
-    fi
-
     if [ -n "${opt_n:-}" ]; then
         INFRACTL_DRYRUN="true"
     fi
 
-    api::run
+
+    if [ -z "${opt_f:-}" ]; then
+        log critical "usage: $0 run [-n] -f <manifest>"
+    fi
+
+    workspace::new "$opt_f"
+    for doc in $(workspace::documents); do
+        workspace::set "$doc"
+        api::run
+    done
 }
 
 command_clean() {
@@ -92,13 +102,12 @@ command_clean() {
     esac
     done
 
-    if [ -n "${opt_f:-}" ]; then
-        resource::new "$opt_f"
-    else
+    if [ -z "${opt_f:-}" ]; then
         log critical "usage: $0 clean -f <manifest>"
     fi
 
-    rm -rf "$(build::path::dist)"
+    workspace::new "$opt_f"
+    rm -rf "$(workspace::dir)"
 }
 
 command_install() {
