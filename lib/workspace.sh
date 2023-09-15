@@ -85,3 +85,13 @@ workspace::documents::new() {
 workspace::documents() {
     ls "$(workspace::documents::dir)"/documents.part*.yml
 }
+
+workspace::set() {
+    local -r v="$1"
+    if [ ! -f "$v" ]; then
+        log critical "workspace: set: not found: $v"
+    fi
+
+    resource::new "$v"
+    api::new "$(resource::metadata::apiversion)"
+}

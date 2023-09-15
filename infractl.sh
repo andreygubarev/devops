@@ -42,14 +42,13 @@ command_build() {
     esac
     done
 
-    if [ ! -n "${opt_f:-}" ]; then
+    if [ -z "${opt_f:-}" ]; then
         log critical "usage: $0 build -f <manifest>"
     fi
 
     workspace::new "$opt_f"
     for doc in $(workspace::documents); do
-        resource::new "$doc"
-        api::new "$(resource::metadata::apiversion)"
+        workspace::set "$doc"
         build::new
     done
 }
@@ -72,17 +71,20 @@ command_run() {
         esac
     done
 
-    if [ -n "${opt_f:-}" ]; then
-        resource::new "$opt_f"
-    else
-        log critical "usage: $0 run [-n] -f <manifest>"
-    fi
-
     if [ -n "${opt_n:-}" ]; then
         INFRACTL_DRYRUN="true"
     fi
 
-    api::run
+
+    if [ -z "${opt_f:-}" ]; then
+        log critical "usage: $0 run [-n] -f <manifest>"
+    fi
+
+    workspace::new "$opt_f"
+    for doc in $(workspace::documents); do
+        workspace::set "$doc"
+        api::run
+    done
 }
 
 command_clean() {
@@ -100,13 +102,12 @@ command_clean() {
     esac
     done
 
-    if [ -n "${opt_f:-}" ]; then
-        resource::new "$opt_f"
-    else
+    if [ -z "${opt_f:-}" ]; then
         log critical "usage: $0 clean -f <manifest>"
     fi
 
-    rm -rf "$(build::path::dist)"
+    workspace::new "$opt_f"
+    rm -rf "$(workspace::dir)"
 }
 
 command_install() {
