@@ -19,7 +19,7 @@ workspace::new() {
     popd > /dev/null || exit 1
 
     workspace::snapshot::new
-    workspace::resource::new
+    workspace::document::new
 }
 
 workspace::dir() {
@@ -60,19 +60,19 @@ workspace::manifest::path() {
     echo "$(workspace::snapshot::dir)/$manifest_file"
 }
 
-workspace::resource::dir() {
-    local -r v="$(workspace::dir)/resource"
+workspace::document::dir() {
+    local -r v="$(workspace::dir)/document"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
-    log debug "workspace: resource dir: $v"
+    log debug "workspace: document dir: $v"
     echo "$v"
 }
 
-workspace::resource::new() {
-    yq --prettyPrint --no-colors "$(workspace::manifest::path)" > "$(workspace::resource::dir)/resource.yml"
-    pushd "$(workspace::resource::dir)" > /dev/null || exit 1
+workspace::document::new() {
+    yq --prettyPrint --no-colors "$(workspace::manifest::path)" > "$(workspace::document::dir)/document.yml"
+    pushd "$(workspace::document::dir)" > /dev/null || exit 1
     # shellcheck disable=SC2016
-    yq -s '"resource.part" + $index + ".yml"' resource.yml
+    yq -s '"document.part" + $index + ".yml"' document.yml
     popd > /dev/null || exit 1
 }
