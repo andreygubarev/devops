@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# namespace: manifest
+# namespace: resource
 
 resource::new() {
     local -r v=$(readlink -f "$1")
