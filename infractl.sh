@@ -47,7 +47,7 @@ command_build() {
 
     if [ -n "${opt_f:-}" ]; then
         workspace::new "$opt_f"
-        workspace::path
+        snapshot::new
         exit 1
         resource::new "$opt_f"
     else
