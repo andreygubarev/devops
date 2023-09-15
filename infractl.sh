@@ -18,9 +18,6 @@ source "$INFRACTL_PATH/lib/logging.sh"
 # shellcheck source=lib/workspace.sh
 source "$INFRACTL_PATH/lib/workspace.sh"
 
-# shellcheck source=lib/snapshot.sh
-source "$INFRACTL_PATH/lib/snapshot.sh"
-
 # shellcheck source=lib/resource.sh
 source "$INFRACTL_PATH/lib/resource.sh"
 
@@ -47,7 +44,6 @@ command_build() {
 
     if [ -n "${opt_f:-}" ]; then
         workspace::new "$opt_f"
-        snapshot::new
         exit 1
         resource::new "$opt_f"
     else
