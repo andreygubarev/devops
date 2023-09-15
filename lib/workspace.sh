@@ -18,6 +18,7 @@ workspace::new() {
     manifest_version=$(git rev-parse --short HEAD)
     popd > /dev/null || exit 1
 
+    rm -rf "${manifest_dir:?}/$INFRACTL_WORKSPACE/$manifest_version"
     workspace::snapshot::new
     workspace::document::new
 }
@@ -43,7 +44,7 @@ workspace::snapshot::dir() {
 workspace::snapshot::new() {
     snapshot_archive="$(mktemp)"
     trap 'rm -f "$snapshot_archive"' EXIT
-    tar -czf "$snapshot_archive" -C "$(workspace::manifest::dir)" --exclude="$INFRACTL_WORKSPACE" .
+    tar -czf "$snapshot_archive" -C "$manifest_dir" --exclude="$INFRACTL_WORKSPACE" .
     log debug "workspace: snapshot archive: $snapshot_archive"
     tar -xzf "$snapshot_archive" -C "$(workspace::snapshot::dir)"
 }
@@ -65,7 +66,7 @@ workspace::manifest::version() {
 }
 
 workspace::document::dir() {
-    local -r v="$(workspace::dir)/document"
+    local -r v="$(workspace::dir)/documents"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
