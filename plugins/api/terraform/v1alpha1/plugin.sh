@@ -102,12 +102,12 @@ api::template::render() {
 ### Runtime ###################################################################
 api::environment() {
     cat <<- EOF
-    TERRAGRUNT_DOWNLOAD="$(workspace::var::cache 'terragrunt')"
-    export TERRAGRUNT_DOWNLOAD
-    TF_PLUGIN_CACHE_DIR="$(workspace::var::cache 'terraform')"
-    export TF_PLUGIN_CACHE_DIR
-    TF_DATA_DIR="$(workspace::var::data 'terraform')"
-    export TF_DATA_DIR
+TERRAGRUNT_DOWNLOAD="$(workspace::var::cache 'terragrunt')"
+export TERRAGRUNT_DOWNLOAD
+TF_PLUGIN_CACHE_DIR="$(workspace::var::cache 'terraform')"
+export TF_PLUGIN_CACHE_DIR
+TF_DATA_DIR="$(workspace::var::data 'terraform')"
+export TF_DATA_DIR
 EOF
 }
 

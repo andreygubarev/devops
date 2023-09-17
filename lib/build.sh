@@ -44,6 +44,7 @@ build::environment() {
     if [ ! -f "$(build::path::dir)/.envrc" ]; then
         touch "$(build::path::dir)/.envrc"
     fi
+
     api::environment >> "$(build::path::dir)/.envrc"
 
     local -r envrc="$(resource::query '.metadata.annotations["direnv.net/envrc"]')"
