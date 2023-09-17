@@ -100,6 +100,16 @@ api::template::render() {
 }
 
 ### Runtime ###################################################################
+api::environment() {
+    cat <<- EOF
+    TERRAGRUNT_DOWNLOAD="$(workspace::var::cache 'terragrunt')"
+    export TERRAGRUNT_DOWNLOAD
+    TF_PLUGIN_CACHE_DIR="$(workspace::var::cache 'terraform')"
+    export TF_PLUGIN_CACHE_DIR
+    TF_DATA_DIR="$(workspace::var::data 'terraform')"
+    export TF_DATA_DIR
+EOF
+}
 
 api::run() {
     build_output=$(build::new)
@@ -109,13 +119,6 @@ api::run() {
         direnv allow .
         eval "$(direnv export bash)"
     fi
-
-    TERRAGRUNT_DOWNLOAD="$(workspace::var::cache 'terragrunt')"
-    export TERRAGRUNT_DOWNLOAD
-    TF_PLUGIN_CACHE_DIR="$(workspace::var::cache 'terraform')"
-    export TF_PLUGIN_CACHE_DIR
-    TF_DATA_DIR="$(workspace::var::data 'terraform')"
-    export TF_DATA_DIR
 
     terraform::set_version
     terraform::set_terragrunt_version
