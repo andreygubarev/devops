@@ -99,10 +99,16 @@ api::template::render() {
 api::run() {
     build_output=$(build::new)
     pushd "$build_output"
+
     if [ -f ".envrc" ]; then
         direnv allow .
         eval "$(direnv export bash)"
     fi
+
+    export TERRAGRUNT_DOWNLOAD=$(workspace::cache::dir)/terragrunt
+    mkdir -p "$TERRAGRUNT_DOWNLOAD"
+    export TF_PLUGIN_CACHE_DIR=$(workspace::cache::dir)/terraform
+    mkdir -p "$TF_PLUGIN_CACHE_DIR"
 
     terraform::set_version
     terraform::set_terragrunt_version

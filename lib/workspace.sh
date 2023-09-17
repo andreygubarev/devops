@@ -32,6 +32,15 @@ workspace::dir() {
     echo "$v"
 }
 
+workspace::cache::dir() {
+    local -r v="$(workspace::dir)/cache"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: cache dir: $v"
+    echo "$v"
+}
+
 workspace::snapshot::dir() {
     local -r v="$(workspace::dir)/snapshot"
     if [ ! -d "$v" ]; then
