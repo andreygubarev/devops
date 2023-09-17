@@ -80,6 +80,10 @@ api::template::render() {
 }
 
 ### Runtime ###################################################################
+api::environment() {
+    echo ""
+}
+
 api::run() {
     build_output=$(build::new)
     pushd "$build_output"
