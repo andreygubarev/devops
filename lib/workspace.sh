@@ -67,6 +67,19 @@ workspace::var::data() {
     echo "$v"
 }
 
+workspace::var::run() {
+    if [ -z "$1" ]; then
+        log critical "workspace: run dir: no argument provided"
+    fi
+
+    local -r v="$(workspace::var)/run/$1/$(resource::metadata::name)"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: run dir: $v"
+    echo "$v"
+}
+
 workspace::snapshot::dir() {
     local -r v="$(workspace::dir)/snapshot"
     if [ ! -d "$v" ]; then
