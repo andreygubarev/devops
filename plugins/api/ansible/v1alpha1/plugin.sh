@@ -83,8 +83,10 @@ api::template::render() {
 api::run() {
     build_output=$(build::new)
     pushd "$build_output"
-    direnv allow .
-    eval "$(direnv export bash)"
+    if [ -f ".envrc" ]; then
+        direnv allow .
+        eval "$(direnv export bash)"
+    fi
 
     echo "ansible-playbook $(ansible::inventory) $(ansible::dry_run) $(ansible::extra_vars "$(build::path::output)") src/$(ansible::playbook)"
     popd

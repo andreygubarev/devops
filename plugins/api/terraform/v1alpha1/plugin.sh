@@ -99,8 +99,10 @@ api::template::render() {
 api::run() {
     build_output=$(build::new)
     pushd "$build_output"
-    direnv allow .
-    eval "$(direnv export bash)"
+    if [ -f ".envrc" ]; then
+        direnv allow .
+        eval "$(direnv export bash)"
+    fi
 
     terraform::set_version
     terraform::set_terragrunt_version
