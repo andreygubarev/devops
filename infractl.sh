@@ -30,7 +30,7 @@ source "$INFRACTL_PATH/lib/api.sh"
 ### Command line #############################################################
 
 command_build() {
-    while getopts ":f:" opt; do
+    while getopts ":f" opt; do
     case $opt in
         f) opt_f="$OPTARG" ;;
         \?)
@@ -43,7 +43,7 @@ command_build() {
     done
 
     if [ -z "${opt_f:-}" ]; then
-        log critical "usage: $0 build -f <manifest>"
+        opt_f="Infrafile"
     fi
 
     workspace::new "$opt_f"
@@ -75,9 +75,8 @@ command_run() {
         INFRACTL_DRYRUN="true"
     fi
 
-
     if [ -z "${opt_f:-}" ]; then
-        log critical "usage: $0 run [-n] -f <manifest>"
+        opt_f="Infrafile"
     fi
 
     workspace::new "$opt_f"
@@ -88,7 +87,7 @@ command_run() {
 }
 
 command_clean() {
-    while getopts ":f:" opt; do
+    while getopts ":f" opt; do
     case $opt in
         f)
             opt_f="$OPTARG"
@@ -103,7 +102,7 @@ command_clean() {
     done
 
     if [ -z "${opt_f:-}" ]; then
-        log critical "usage: $0 clean -f <manifest>"
+        opt_f="Infrafile"
     fi
 
     workspace::new "$opt_f"
