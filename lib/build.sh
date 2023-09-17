@@ -41,8 +41,9 @@ build::copy::source() {
 }
 
 build::copy::environment() {
-    if [ -f "$(workspace::snapshot::dir)/.envrc" ]; then
-        cat "$(workspace::snapshot::dir)/.envrc" >> "$(build::path::dir)/.envrc"
+    local -r envrc="$(resource::query '.metadata.annotations["direnv.net/envrc"]')"
+    if [ -n "$envrc" ]; then
+        echo "$envrc" > "$(build::path::dir)/.envrc"
         direnv allow "$(build::path::dir)"
     fi
 }
