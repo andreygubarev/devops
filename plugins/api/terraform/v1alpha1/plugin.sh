@@ -105,10 +105,12 @@ api::run() {
         eval "$(direnv export bash)"
     fi
 
-    export TERRAGRUNT_DOWNLOAD=$(workspace::cache::dir)/terragrunt
-    mkdir -p "$TERRAGRUNT_DOWNLOAD"
-    export TF_PLUGIN_CACHE_DIR=$(workspace::cache::dir)/terraform
-    mkdir -p "$TF_PLUGIN_CACHE_DIR"
+    TERRAGRUNT_DOWNLOAD="$(workspace::dir::cache 'terragrunt')"
+    export TERRAGRUNT_DOWNLOAD
+    TF_PLUGIN_CACHE_DIR="$(workspace::dir::cache 'terraform')"
+    export TF_PLUGIN_CACHE_DIR
+    TF_DATA_DIR="$(workspace::dir::data 'terraform')"
+    export TF_DATA_DIR
 
     terraform::set_version
     terraform::set_terragrunt_version

@@ -32,12 +32,29 @@ workspace::dir() {
     echo "$v"
 }
 
-workspace::cache::dir() {
-    local -r v="$(workspace::dir)/cache"
+workspace::dir::cache() {
+    if [ -z "$1" ]; then
+        log critical "workspace: cache dir: no argument provided"
+    fi
+
+    local -r v="$(workspace::dir)/cache/$1"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
     log trace "workspace: cache dir: $v"
+    echo "$v"
+}
+
+workspace::dir::data() {
+    if [ -z "$1" ]; then
+        log critical "workspace: data dir: no argument provided"
+    fi
+
+    local -r v="$(workspace::dir)/lib/$1"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: data dir: $v"
     echo "$v"
 }
 
