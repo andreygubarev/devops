@@ -13,16 +13,21 @@ terraform::settings::labels() {
     echo "$v" | xargs echo
 }
 
-terraform::settings::remote_state_backend() {
-    resource::query '.metadata.annotations["terraform.io/remote-state-backend"]'
+terraform::settings::backend() {
+    local -r v=$(resource::query '.metadata.annotations["terraform.io/backend"]')
+    if [ -n "$v" ]; then
+        echo "$v"
+    else
+        echo "local://$(workspace::var::data 'terraform')/terraform.tfstate"
+    fi
 }
 
-terraform::settings::remote_state_locking() {
-    resource::query '.metadata.annotations["terraform.io/remote-state-locking"]'
+terraform::settings::backend_lock() {
+    resource::query '.metadata.annotations["terraform.io/backend-lock"]'
 }
 
-terraform::settings::remote_state_region() {
-    resource::query '.metadata.annotations["terraform.io/remote-state-region"]'
+terraform::settings::backend_region() {
+    resource::query '.metadata.annotations["terraform.io/backend-region"]'
 }
 
 ### Runtime ###################################################################
@@ -78,9 +83,9 @@ default_context:
     name: "$(resource::metadata::name)"
     version: "$(workspace::manifest::version)"
     terraform_metadata_labels: "$(terraform::settings::labels)"
-    terraform_remote_state_backend: "$(terraform::settings::remote_state_backend)"
-    terraform_remote_state_locking: "$(terraform::settings::remote_state_locking)"
-    terraform_remote_state_region: "$(terraform::settings::remote_state_region)"
+    terraform_backend: "$(terraform::settings::backend)"
+    terraform_remote_state_locking: "$(terraform::settings::backend_lock)"
+    terraform_remote_state_region: "$(terraform::settings::backend_region)"
     terraform_version: "$(terraform::settings::version)"
     terragrunt_version: "$(terraform::settings::terragrunt_version)"
 EOF

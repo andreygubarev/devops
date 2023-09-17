@@ -33,7 +33,7 @@ EOF
 }
 
 ### Backend ###################################################################
-{%- set backend = cookiecutter.terraform_remote_state_backend %}
+{%- set backend = cookiecutter.terraform_backend %}
 {%- set backend_name = backend.split("://") | first %}
 
 {%- if backend_name == "s3" %}
@@ -41,7 +41,7 @@ EOF
 
 {%- set backend_s3_bucket = (backend.split("://") | last).split("/") | first %}
 {%- set backend_s3_key = (backend.split("://") | last).split("/", 1) | last %}
-{%- if cookiecutter.terraform_remote_state_locking -%}
+{%- if cookiecutter.terraform_backend_lock -%}
 {%- set backend_dynamodb = (backend.split("://") | last).split("/") | first %}
 {%- else %}
 {%- set backend_dynamodb = "" %}
@@ -62,7 +62,28 @@ remote_state {
     encrypt                  = true
     skip_bucket_root_access  = true
     skip_bucket_enforced_tls = true
-    region                   = "{{ cookiecutter.terraform_remote_state_region }}"
+    {%- if cookiecutter.terraform_backend_region %}
+    region                   = "{{ cookiecutter.terraform_backend_region }}"
+    {%- endif %}
   }
 }
+{%- endif %}
+
+{%- if backend_name == "local" %}
+### Backend | Local ###########################################################
+
+{%- set backend_path = (backend.split("://") | last) %}
+
+generate "backend" {
+  path      = "backend.terragrunt.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+terraform {
+  backend "local" {
+    path = "{{ backend_path }}"
+  }
+}
+EOF
+}
+
 {%- endif %}

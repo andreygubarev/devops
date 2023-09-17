@@ -46,7 +46,7 @@ workspace::var::cache() {
         log critical "workspace: cache dir: no argument provided"
     fi
 
-    local -r v="$(workspace::var)/cache/$1"
+    local -r v="$(workspace::var)/cache/$1/$(resource::metadata::name)"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
@@ -59,7 +59,7 @@ workspace::var::data() {
         log critical "workspace: data dir: no argument provided"
     fi
 
-    local -r v="$(workspace::var)/lib/$1"
+    local -r v="$(workspace::var)/lib/$1/$(resource::metadata::name)"
     if [ ! -d "$v" ]; then
         mkdir -p "$v"
     fi
