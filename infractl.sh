@@ -30,35 +30,52 @@ source "$INFRACTL_PATH/lib/api.sh"
 ### Command line #############################################################
 
 command_build() {
-    while getopts ":f" opt; do
-    case $opt in
-        f) opt_f="$OPTARG" ;;
-        \?)
-            log critical "invalid option: -$OPTARG"
-            ;;
-        :)
-            log critical "option -$OPTARG requires an argument."
-            ;;
-    esac
+    while getopts ":f:t:" opt; do
+        case $opt in
+            f)
+                opt_f="$OPTARG"
+                ;;
+            t)
+                opt_t="$OPTARG"
+                ;;
+            \?)
+                log critical "invalid option: -$OPTARG"
+                ;;
+            :)
+                log critical "option -$OPTARG requires an argument."
+                ;;
+        esac
     done
 
     if [ -z "${opt_f:-}" ]; then
         opt_f="Infrafile"
     fi
 
+    if [ -z "${opt_t:-}" ]; then
+        opt_t=""
+    fi
+
     workspace::new "$opt_f"
     for doc in $(workspace::documents); do
         workspace::set "$doc"
-        build::new
+        if [ -z "${opt_t}" ]; then
+            build::new
+        elif [ "${opt_t}" == "$(resource::metadata::name)" ]; then
+            build::new
+        fi
     done
 }
 
 command_run() {
-    while getopts ":f:n" opt; do
+    while getopts ":f:t:n" opt; do
         case $opt in
             f)
                 opt_f="$OPTARG"
                 ;;
+            t)
+                opt_t="$OPTARG"
+                ;;
+
             n)
                 opt_n=true
                 ;;
@@ -79,10 +96,18 @@ command_run() {
         opt_f="Infrafile"
     fi
 
+    if [ -z "${opt_t:-}" ]; then
+        opt_t=""
+    fi
+
     workspace::new "$opt_f"
     for doc in $(workspace::documents); do
         workspace::set "$doc"
-        api::run
+        if [ -z "${opt_t}" ]; then
+            api::run
+        elif [ "${opt_t}" == "$(resource::metadata::name)" ]; then
+            api::run
+        fi
     done
 }
 
