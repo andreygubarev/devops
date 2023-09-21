@@ -25,7 +25,7 @@ resource::query() {
 
     local -r v=$(echo "$resource" | yq "$query")
     if [ "$v" == "null" ]; then
-        log warn "resource: field not found: $query"
+        log info "resource: field not found: $query"
         return
     fi
     echo "$v"

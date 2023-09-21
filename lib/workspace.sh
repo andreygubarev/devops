@@ -32,6 +32,54 @@ workspace::dir() {
     echo "$v"
 }
 
+workspace::var() {
+    local -r v="$manifest_dir/$INFRACTL_WORKSPACE/var"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: dir: $v"
+    echo "$v"
+}
+
+workspace::var::cache() {
+    if [ -z "$1" ]; then
+        log critical "workspace: cache dir: no argument provided"
+    fi
+
+    local -r v="$(workspace::var)/cache/$1/$(resource::metadata::name)"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: cache dir: $v"
+    echo "$v"
+}
+
+workspace::var::data() {
+    if [ -z "$1" ]; then
+        log critical "workspace: data dir: no argument provided"
+    fi
+
+    local -r v="$(workspace::var)/lib/$1/$(resource::metadata::name)"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: data dir: $v"
+    echo "$v"
+}
+
+workspace::var::run() {
+    if [ -z "$1" ]; then
+        log critical "workspace: run dir: no argument provided"
+    fi
+
+    local -r v="$(workspace::var)/run/$1/$(resource::metadata::name)"
+    if [ ! -d "$v" ]; then
+        mkdir -p "$v"
+    fi
+    log trace "workspace: run dir: $v"
+    echo "$v"
+}
+
 workspace::snapshot::dir() {
     local -r v="$(workspace::dir)/snapshot"
     if [ ! -d "$v" ]; then
@@ -44,7 +92,10 @@ workspace::snapshot::dir() {
 workspace::snapshot::new() {
     snapshot_archive="$(mktemp)"
     trap 'rm -f "$snapshot_archive"' EXIT
-    tar -czf "$snapshot_archive" -C "$manifest_dir" --exclude="$INFRACTL_WORKSPACE" .
+    tar -czf "$snapshot_archive" -C "$manifest_dir" \
+        --exclude=".git" \
+        --exclude="$INFRACTL_WORKSPACE" \
+        .
     log debug "workspace: snapshot archive: $snapshot_archive"
     tar -xzf "$snapshot_archive" -C "$(workspace::snapshot::dir)"
 }

@@ -29,7 +29,7 @@ build::copy::file() {
     cp -r "$src" "$(build::path::dir)/src"
 }
 
-build::copy::source() {
+build::source() {
     case "$(resource::source::scheme)" in
         "file")
             build::copy::file
@@ -40,18 +40,26 @@ build::copy::source() {
     esac
 }
 
-build::copy::environment() {
-    if [ -f "$(workspace::snapshot::dir)/.envrc" ]; then
-        cat "$(workspace::snapshot::dir)/.envrc" >> "$(build::path::dir)/.envrc"
-        direnv allow "$(build::path::dir)"
+build::environment() {
+    if [ ! -f "$(build::path::dir)/.envrc" ]; then
+        touch "$(build::path::dir)/.envrc"
     fi
+
+    api::environment >> "$(build::path::dir)/.envrc"
+
+    local -r envrc="$(resource::query '.metadata.annotations["direnv.net/envrc"]')"
+    if [ -n "$envrc" ]; then
+        echo "$envrc" >> "$(build::path::dir)/.envrc"
+    fi
+
+    direnv allow "$(build::path::dir)"
 }
 
 build::new() {
     api::template::render_config "$(build::path::config)"
     api::template::render "$(build::path::config)" "$(workspace::dir)/build/"
-    build::copy::environment
-    build::copy::source
+    build::environment
+    build::source
 
     build::path::dir
 }
