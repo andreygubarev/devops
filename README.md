@@ -1,8 +1,8 @@
-# infractl
+# DevOps SDK
 
 # Installation
 
 ```bash
-git clone git@github.com:andreygubarev/infractl.git ~/.infractl
-ln -s ~/.infractl/infractl.sh ~/.local/bin/infractl
+git clone git@github.com:andreygubarev/devops.git ~/.devops
+ln -s ~/.devops/infractl.sh ~/.local/bin/infractl
 ```
